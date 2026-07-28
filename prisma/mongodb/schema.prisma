@@ -1,0 +1,212 @@
+generator client {
+    provider = "prisma-client-js"
+    output   = "../../generated/mongo"
+}
+
+datasource db {
+    provider = "mongodb"
+    url = env("DATABASE_MONGODB_URL")
+}
+
+model ProblemDocument {
+    id              String   @id @default(auto()) @map("_id") @db.ObjectId
+    problemId       String   @unique
+    statement       String
+    examples        Json
+    constraints     String[]
+    hints           String[]
+    codeTemplates   Json?
+    complexity      Json?
+    relatedPatterns String[]
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+}
+
+model ProblemAIContent {
+    id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+    problemId          String   @unique
+    explanation        String?
+    bruteForceApproach String?
+    optimalApproach    String?
+    interviewTips      String[]
+    commonMistakes     String[]
+    followUpQuestions  String[]
+    optimizationNotes  String?
+    intuition          String?
+    generatedBy        String?
+    modelVersion       String
+    createdAt          DateTime @default(now())
+    updatedAt          DateTime @updatedAt
+}
+
+model RoadmapDocument {
+    id                String   @id @default(auto()) @map("_id") @db.ObjectId
+    roadmapId         String   @unique
+    overview          String
+    weeklyPlan        Json
+    learningStrategy  String
+    interviewStrategy String?
+    motivation        String?
+    generatedBy       String?
+    modelVersion      String
+    createdAt         DateTime @default(now())
+    updatedAt         DateTime @updatedAt
+}
+
+model WeaknessExplanation {
+    id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+    weaknessAnalysisId String   @unique
+    analysis           String
+    rootCause          String
+    improvementPlan    String
+    examples           String[]
+    resources          Json?
+    generatedBy        String?
+    modelVersion       String
+    createdAt          DateTime @default(now())
+    updatedAt          DateTime @updatedAt
+}
+
+model RecommendationExplanation {
+    id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+    recommendationId    String   @unique
+    reasoning           String
+    whyNow              String
+    expectedOutcome     String
+    interviewImportance String?
+    generatedBy         String?
+    modelVersion        String
+    createdAt           DateTime @default(now())
+    updatedAt           DateTime @updatedAt
+}
+
+model RevisionDocument {
+    id             String   @id @default(auto()) @map("_id") @db.ObjectId
+    revisionTaskId String   @unique
+    summary        String
+    cheatSheet     String
+    commonMistakes String[]
+    interviewTips  String[]
+    generatedBy    String?
+    modelVersion   String
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
+}
+
+model AIConversation {
+    id           String   @id @default(auto()) @map("_id") @db.ObjectId
+    userId       String
+    title        String?
+    messages     Json[]
+    context      Json?
+    generatedBy  String?
+    modelVersion String
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+
+    @@index([userId])
+}
+
+model GithubSummary {
+    id              String   @id @default(auto()) @map("_id") @db.ObjectId
+    userId          String
+    date            DateTime
+    summaryMarkdown String
+    repositoryName  String?
+    commitMessage   String
+    commitHash      String
+    branch          String
+    filesChanged    String?
+    generatedBy     String?
+    modelVersion    String
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+
+    @@index([userId])
+    @@index([date])
+}
+
+model MockOAQuestionDocument {
+    id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+    questionId           String   @unique
+    title                String
+    statement            String
+    inputFormat          String?
+    outputFormat         String?
+    constraints          String[]
+    examples             Json
+    explanation          String?
+    codeTemplates        Json?
+    sampleTestCases      Json
+    hiddenTestCasesCount Int?
+    createdAt            DateTime @default(now())
+    updatedAt            DateTime @updatedAt
+}
+
+model MockOAQuestionAIContent {
+    id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+    questionId         String   @unique
+    intuition          String?
+    bruteForceApproach String?
+    optimalApproach    String?
+    dryRun             String?
+    complexityAnalysis String?
+    commonMistakes     String[]
+    optimizationNotes  String?
+    interviewTips      String[]
+    followUpQuestions  String[]
+    generatedBy        String?
+    modelVersion       String
+    createdAt          DateTime @default(now())
+    updatedAt          DateTime @updatedAt
+}
+
+model MockOAEvaluationRubric {
+    id           String   @id @default(auto()) @map("_id") @db.ObjectId
+    questionId   String   @unique
+    rubric       Json
+    scoringGuide Json
+    generatedBy  String?
+    modelVersion String
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+}
+
+model MockOAEditorial {
+    id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+    questionId           String   @unique
+    editorial            String
+    visualization        Json?
+    alternativeSolutions Json?
+    generatedBy          String?
+    modelVersion         String
+    createdAt            DateTime @default(now())
+    updatedAt            DateTime @updatedAt
+}
+
+model MockOAInterviewInsight {
+    id                      String   @id @default(auto()) @map("_id") @db.ObjectId
+    questionId              String   @unique
+    companyInsights         Json
+    followUpPatterns        String[]
+    interviewerExpectations String[]
+    difficultyReason        String?
+    modelVersion            String
+    createdAt               DateTime @default(now())
+    updatedAt               DateTime @updatedAt
+}
+
+model MockOAAIFeedback {
+    id                      String   @id @default(auto()) @map("_id") @db.ObjectId
+    attemptId               String   @unique
+    summary                 String
+    strengths               String[]
+    weaknesses              String[]
+    codeReview              String
+    optimizationSuggestions String[]
+    interviewReadiness      String
+    generatedBy             String?
+    modelVersion            String
+    createdAt               DateTime @default(now())
+    updatedAt               DateTime @updatedAt
+}
