@@ -7,12 +7,13 @@ import hpp from "hpp";
 import { corsOptions } from "./config/cors";
 import { env } from "./config/env";
 import { logger } from "./config/logger";
-import { prisma } from "./config/prisma";
-import { redis } from "./config/redis";
+import { postgres } from "./database/postgres/postgres";
+import { redisClient } from "./database/redis";
 import { errorHandler } from "./middleware/errorHandler.middleware";
 import { notFound } from "./middleware/notFound.middleware";
 import { apiLimiter } from "./middleware/rateLimiter.middleware";
 import { requestLogger } from "./middleware/requestLogger.middleware";
+import authRoutes from "./modules/auth/auth.routes";
 
 const app = express();
 
@@ -82,14 +83,14 @@ app.get("/ready", async (_req, res) => {
   };
 
   try {
-    await prisma.$queryRaw`SELECT 1`;
+    await postgres.$queryRaw`SELECT 1`;
     checks.database = true;
   } catch (err) {
     logger.warn({ err }, "Database health check failed");
   }
 
   try {
-    await redis.ping();
+    await redisClient.ping();
     checks.redis = true;
   } catch (err) {
     logger.warn({ err }, "Redis health check failed");
@@ -104,6 +105,8 @@ app.get("/ready", async (_req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+app.use("/api/auth", authRoutes);
 
 app.use(notFound);
 
