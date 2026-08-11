@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  redis:
+    image: redis:8-alpine
+    container_name: algoforge-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: algoforge-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: algoforge
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  mongo:
+    image: mongo:8
+    container_name: algoforge-mongodb
+
+    restart: unless-stopped
+
+    ports:
+      - "27017:27017"
+
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  postgres-data:
+  mongo-data:
