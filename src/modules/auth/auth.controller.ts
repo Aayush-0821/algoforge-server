@@ -50,37 +50,37 @@ export class AuthController {
       next(error);
     }
   }
-  async verifyEmail(req:Request, res:Response, next: NextFunction): Promise<void>{
+  async verifyEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-        await authService.verifyEmail(req.body);
+      await authService.verifyEmail(req.body);
 
-        res.status(200).json({
-            message: "Email Verified SuccessFully!"
-        });
+      res.status(200).json({
+        message: "Email Verified SuccessFully!",
+      });
     } catch (error) {
-        next(error);
+      next(error);
     }
   }
-  async forgotPassword(req:Request, res:Response, next: NextFunction):Promise<void>{
+  async forgotPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-        await authService.forgotPassword(req.body);
+      await authService.forgotPassword(req.body);
 
-        res.status(200).json({
-            message: "Frogot Password request SuccessFul."
-        });
+      res.status(200).json({
+        message: "Frogot Password request SuccessFul.",
+      });
     } catch (error) {
-        next(error);
+      next(error);
     }
   }
-  async resetPassword(req:Request, res: Response, next: NextFunction):Promise<void>{
+  async resetPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-        await authService.resetPassword(req.body);
+      await authService.resetPassword(req.body);
 
-        res.status(200).json({
-            message: "Password Reset SuccessFul."
-        });
+      res.status(200).json({
+        message: "Password Reset SuccessFul.",
+      });
     } catch (error) {
-        next(error);
+      next(error);
     }
   }
 }

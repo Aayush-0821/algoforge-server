@@ -45,9 +45,7 @@ export function getGitHubAuthUrl(state: string): string {
   return `${GITHUB_AUTH_URL}?${params.toString()}`;
 }
 
-export async function exchangeGitHubCode(
-  code: string,
-): Promise<GitHubProfile> {
+export async function exchangeGitHubCode(code: string): Promise<GitHubProfile> {
   const tokenResponse = await fetch(GITHUB_TOKEN_URL, {
     method: "POST",
     headers: {
@@ -63,7 +61,7 @@ export async function exchangeGitHubCode(
   });
 
   if (!tokenResponse.ok) {
-    throw new AppError("Failed to exchange GitHub authorization code.",500);
+    throw new AppError("Failed to exchange GitHub authorization code.", 500);
   }
 
   const tokens = (await tokenResponse.json()) as GitHubTokenResponse;
@@ -79,7 +77,7 @@ export async function exchangeGitHubCode(
   });
 
   if (!userResponse.ok) {
-    throw new AppError("Failed to fetch GitHub user profile.",500);
+    throw new AppError("Failed to fetch GitHub user profile.", 500);
   }
 
   const user = (await userResponse.json()) as GitHubUser;
@@ -89,19 +87,15 @@ export async function exchangeGitHubCode(
   });
 
   if (!emailResponse.ok) {
-    throw new AppError("Failed to fetch GitHub email.",500);
+    throw new AppError("Failed to fetch GitHub email.", 500);
   }
 
   const emails = (await emailResponse.json()) as GitHubEmail[];
 
-  const primaryEmail = emails.find(
-    (email) => email.primary && email.verified,
-  );
+  const primaryEmail = emails.find((email) => email.primary && email.verified);
 
   if (!primaryEmail) {
-    throw new AppError(
-      "No verified primary GitHub email was found.",500
-    );
+    throw new AppError("No verified primary GitHub email was found.", 500);
   }
 
   return {

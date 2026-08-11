@@ -12,17 +12,9 @@ export async function generatePrismaClients() {
   cli.start("Generating Prisma clients...");
 
   try {
-    await run("npx", [
-      "prisma",
-      "generate",
-      `--schema=${POSTGRES_SCHEMA}`,
-    ]);
+    await run("npx", ["prisma", "generate", `--schema=${POSTGRES_SCHEMA}`]);
 
-    await run("npx", [
-      "prisma",
-      "generate",
-      `--schema=${MONGO_SCHEMA}`,
-    ]);
+    await run("npx", ["prisma", "generate", `--schema=${MONGO_SCHEMA}`]);
 
     cli.succeed("Prisma clients generated");
   } catch {
@@ -35,12 +27,7 @@ export async function deployMigrations() {
   cli.start("Applying database migrations...");
 
   try {
-    await run("npx", [
-      "prisma",
-      "migrate",
-      "deploy",
-      `--schema=${POSTGRES_SCHEMA}`,
-    ]);
+    await run("npx", ["prisma", "migrate", "deploy", `--schema=${POSTGRES_SCHEMA}`]);
 
     cli.succeed("Database migrations applied");
   } catch (error) {

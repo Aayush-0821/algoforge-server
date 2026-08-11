@@ -3,10 +3,7 @@ import { nanoid } from "nanoid";
 import { AppError } from "../../../errors/app.errors";
 import { REFRESH_TOKEN_MAX_AGE } from "../auth.constants";
 import { authRepository } from "../auth.repository";
-import {
-  generateAccessToken,
-  generateRefreshToken,
-} from "../utils/jwt";
+import { generateAccessToken, generateRefreshToken } from "../utils/jwt";
 import { hashToken } from "../utils/token.utils";
 
 import type { GitHubProfile } from "./github.oauth";
@@ -46,25 +43,19 @@ export class OAuthService {
     emailVerified: boolean;
   }) {
     if (!data.emailVerified) {
-      throw new AppError(
-        "OAuth email is not verified.",
-        401,
-      );
+      throw new AppError("OAuth email is not verified.", 401);
     }
-    const oauthAccount =
-      await authRepository.findOAuthAccount(
-        data.provider,
-        data.providerAccountId,
-      );
+    const oauthAccount = await authRepository.findOAuthAccount(
+      data.provider,
+      data.providerAccountId,
+    );
 
     let user;
 
     if (oauthAccount) {
       user = oauthAccount.user;
     } else {
-      user = await authRepository.findUserByEmail(
-        data.email,
-      );
+      user = await authRepository.findUserByEmail(data.email);
 
       if (!user) {
         user = await authRepository.createUser({
@@ -73,12 +64,9 @@ export class OAuthService {
           isEmailVerified: true,
         });
       } else if (!user.isEmailVerified) {
-        user = await authRepository.updateUser(
-          user.id,
-          {
-            isEmailVerified: true,
-          },
-        );
+        user = await authRepository.updateUser(user.id, {
+          isEmailVerified: true,
+        });
       }
 
       await authRepository.createOAuthAccount({
@@ -110,9 +98,7 @@ export class OAuthService {
 
     await authRepository.createRefreshToken({
       tokenHash,
-      expiresAt: new Date(
-        Date.now() + REFRESH_TOKEN_MAX_AGE,
-      ),
+      expiresAt: new Date(Date.now() + REFRESH_TOKEN_MAX_AGE),
       user: {
         connect: {
           id: user.id,

@@ -39,7 +39,7 @@ export class CliLogger {
     console.log(chalk.red(message));
   }
 
-  async step(fn: ()=>Promise<void>,){
+  async step(fn: () => Promise<void>) {
     const start = performance.now();
     try {
       await fn();

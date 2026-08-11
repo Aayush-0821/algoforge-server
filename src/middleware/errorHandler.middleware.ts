@@ -4,12 +4,7 @@ import { env } from "../config/env";
 import { logger } from "../config/logger";
 import { AppError } from "../errors/app.errors";
 
-export function errorHandler(
-  err: Error,
-  req: Request,
-  res: Response,
-  _next: NextFunction
-): void {
+export function errorHandler(err: Error, req: Request, res: Response, _next: NextFunction): void {
   logger.error({
     err,
     requestId: req.id,
@@ -26,9 +21,6 @@ export function errorHandler(
 
   res.status(500).json({
     success: false,
-    message:
-      env.NODE_ENV === "production"
-        ? "Internal Server Error"
-        : err.message,
+    message: env.NODE_ENV === "production" ? "Internal Server Error" : err.message,
   });
 }

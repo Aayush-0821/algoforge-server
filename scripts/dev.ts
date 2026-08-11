@@ -1,14 +1,7 @@
 import { cli } from "./logger.js";
-import {
-  ensureDockerInstalled,
-  ensureDockerRunning,
-  startInfrastructure,
-} from "./docker.js";
+import { ensureDockerInstalled, ensureDockerRunning, startInfrastructure } from "./docker.js";
 import { waitForInfrastructure } from "./health.js";
-import {
-  deployMigrations,
-  generatePrismaClients,
-} from "./prisma.js";
+import { deployMigrations, generatePrismaClients } from "./prisma.js";
 import { startServer } from "./server.js";
 
 async function main() {

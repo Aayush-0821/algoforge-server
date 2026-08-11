@@ -1,6 +1,4 @@
-export const verificationEmailTemplate = (
-  verificationUrl: string
-): string => {
+export const verificationEmailTemplate = (verificationUrl: string): string => {
   return `
     <!DOCTYPE html>
     <html>
@@ -35,9 +33,7 @@ export const verificationEmailTemplate = (
   `;
 };
 
-export const passwordResetEmailTemplate = (
-  resetUrl: string
-): string => {
+export const passwordResetEmailTemplate = (resetUrl: string): string => {
   return `
     <!DOCTYPE html>
     <html>
