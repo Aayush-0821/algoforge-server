@@ -1,1123 +1,1125 @@
 generator client {
-    provider = "prisma-client-js"
-    output   = "../../generated/postgres"
+  provider = "prisma-client-js"
+  output   = "../../generated/postgres"
 }
 
 datasource db {
-    provider = "postgresql"
-    url = env("DATABASE_POSTGRES_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_POSTGRES_URL")
 }
 
 enum ExperienceLevel {
-    BEGINNER
-    INTERMEDIATE
-    ADVANCED
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
 }
 
 enum AuthProvider {
-    GOOGLE
-    GITHUB
+  GOOGLE
+  GITHUB
 }
 
 enum DifficultyLevel {
-    EASY
-    MEDIUM
-    HARD
+  EASY
+  MEDIUM
+  HARD
 }
 
 enum SubmissionStatus {
-    ACCEPTED
-    WRONG_ANSWER
-    TIME_LIMIT_EXCEEDED
-    MEMORY_LIMIT_EXCEEDED
-    RUNTIME_ERROR
-    COMPILE_ERROR
+  ACCEPTED
+  WRONG_ANSWER
+  TIME_LIMIT_EXCEEDED
+  MEMORY_LIMIT_EXCEEDED
+  RUNTIME_ERROR
+  COMPILE_ERROR
 }
 
 enum LearningEventType {
-    PROBLEM_OPENED
-    PROBLEM_CLOSED
+  PROBLEM_OPENED
+  PROBLEM_CLOSED
 
-    HINT_OPENED
-    EDITORIAL_OPENED
-    SOLUTION_OPENED
-    DISCUSSION_OPENED
+  HINT_OPENED
+  EDITORIAL_OPENED
+  SOLUTION_OPENED
+  DISCUSSION_OPENED
 
-    CODE_TYPED
-    CODE_PASTED
+  CODE_TYPED
+  CODE_PASTED
 
-    SUBMISSION
+  SUBMISSION
 
-    ACCEPTED
-    WRONG_ANSWER
-    TAB_SWITCH
-    COPY
-    PASTE
-    RUN_CODE
+  ACCEPTED
+  WRONG_ANSWER
+  TAB_SWITCH
+  COPY
+  PASTE
+  RUN_CODE
 }
 
 enum RoadmapStatus {
-    ACTIVE
-    COMPLETED
+  ACTIVE
+  COMPLETED
 }
 
 enum RoadmapItemsStatus {
-    NOT_STARTED
-    IN_PROGRESS
-    COMPLETED
-    SKIPPED
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  SKIPPED
 }
 
 enum RevisionStatus {
-    PENDING
-    COMPLETED
-    SKIPPED
+  PENDING
+  COMPLETED
+  SKIPPED
 }
 
 enum RecommendationType {
-    PROBLEM
-    TOPIC
-    CONCEPT
-    REVISION
+  PROBLEM
+  TOPIC
+  CONCEPT
+  REVISION
 }
 
 enum SubscriptionTier {
-    FREE
-    PRO
+  FREE
+  PRO
 }
 
 enum BillingCycle {
-    MONTHLY
-    YEARLY
+  MONTHLY
+  YEARLY
 }
 
 enum SubscriptionStatus {
-    ACTIVE
-    CANCELLED
-    EXPIRED
-    PAST_DUE
+  ACTIVE
+  CANCELLED
+  EXPIRED
+  PAST_DUE
 }
 
 enum PaymentStatus {
-    PENDING
-    SUCCESS
-    FAILED
-    REFUNDED
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
 }
 
 enum PaymentProvider {
-    RAZORPAY
+  RAZORPAY
 }
 
 enum PaymentMethod {
-    CARD
-    UPI
-    NETBANKING
+  CARD
+  UPI
+  NETBANKING
 }
 
 enum DiscountType {
-    PERCENTAGE
-    FIXED
+  PERCENTAGE
+  FIXED
 }
 
 enum NotificationType {
-    REVISION
-    ROADMAP
-    DAILY_GOAL
-    WEEKLY_REPORT
-    RECOMMENDATION
-    PAYMENT
-    SUBSCRIPTION
-    MOCK_OA
-    SYSTEM
-    MARKETING
+  REVISION
+  ROADMAP
+  DAILY_GOAL
+  WEEKLY_REPORT
+  RECOMMENDATION
+  PAYMENT
+  SUBSCRIPTION
+  MOCK_OA
+  SYSTEM
+  MARKETING
 }
 
 enum NotificationPriority {
-    LOW
-    NORMAL
-    HIGH
-    URGENT
+  LOW
+  NORMAL
+  HIGH
+  URGENT
 }
 
 enum NotificationChannel {
-    IN_APP
-    EMAIL
+  IN_APP
+  EMAIL
 }
 
 enum DeliveryStatus {
-    PENDING
-    SENT
-    DELIVERED
-    FAILED
+  PENDING
+  SENT
+  DELIVERED
+  FAILED
 }
 
 enum MockOAQuestionType {
-    CODING
+  CODING
 }
 
 enum MockOAAttemptStatus {
-    IN_PROGRESS
-    SUBMITTED
-    EVALUATED
-    EXPIRED
+  IN_PROGRESS
+  SUBMITTED
+  EVALUATED
+  EXPIRED
 }
 
 enum MockOALanguage {
-    JAVA
-    CPP
-    PYTHON
-    JAVASCRIPT
+  JAVA
+  CPP
+  PYTHON
+  JAVASCRIPT
 }
 
 enum HiringRecommendation {
-    STRONG_HIRE
-    HIRE
-    BORDERLINE
-    NO_HIRE
+  STRONG_HIRE
+  HIRE
+  BORDERLINE
+  NO_HIRE
 }
 
 enum AIJobType {
-    ROADMAP
-    REVISION
-    WEAKNESSES
-    RECOMMENDATION
-    CHAT
-    MOCK_OA
-    GITHUB_SUMMARY
+  ROADMAP
+  REVISION
+  WEAKNESSES
+  RECOMMENDATION
+  CHAT
+  MOCK_OA
+  GITHUB_SUMMARY
 }
 
 enum AIJobStatus {
-    QUEUED
-    PROCESSING
-    COMPLETED
-    FAILED
-    CANCELLED
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
 }
 
 enum RoadmapItemType {
-    TOPIC
-    CONCEPT
-    CUSTOM
+  TOPIC
+  CONCEPT
+  CUSTOM
 }
 
 enum AttemptReason {
-    INVALID_PASSWORD
-    USER_NOT_FOUND
-    ACCOUNT_LOCKED
+  INVALID_PASSWORD
+  USER_NOT_FOUND
+  ACCOUNT_LOCKED
 }
 
 enum AuditAction {
-    CREATE
-    UPDATE
-    DELETE
-    LOGIN
-    LOGOUT
-    PASSWORD_RESET
-    EMAIL_VERIFIED
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  PASSWORD_RESET
+  EMAIL_VERIFIED
 }
 
 enum LogLevel {
-    TRACE
-    DEBUG
-    INFO
-    WARN
-    ERROR
-    FATAL
+  TRACE
+  DEBUG
+  INFO
+  WARN
+  ERROR
+  FATAL
 }
 
 model User {
-    id                      String                    @id @default(uuid())
-    email                   String                    @unique
-    password                String?
-    isEmailVerified         Boolean                   @default(false)
-    profile                 UserProfile?
-    preferences             UserPreference?
-    oauthAccounts           OAuthAccount[]
-    languages               UserProgrammingLanguage[]
-    submissions             Submission[]
-    studySessions           StudySession[]
-    learningEvents          LearningEvent[]
-    roadmaps                Roadmap[]
-    recommendations         Recommendation[]
-    revisionTasks           RevisionTask[]
-    weaknessAnalyses        WeaknessAnalysis[]
-    readinessScores         ReadinessScore[]
-    topicProgress           UserTopicProgress[]
-    conceptProgress         UserConceptProgress[]
-    subscription            Subscription?
-    payments                Payment[]
-    mockOAAttempts          MockOAAttempt[]
-    notifications           Notification[]
-    notificationPreference  NotificationPreference?
-    createdAt               DateTime                  @default(now())
-    updatedAt               DateTime                  @updatedAt
-    featureUsages           FeatureUsage[]
-    promoRedemptions        PromoRedemption[]
-    aijobs                  AIJob[]
-    passwordResetTokens     PasswordResetToken[]
-    emailVerificationTokens EmailVerificationToken[]
-    refreshTokens           RefreshToken[]
-    lastLoginAt             DateTime?
-    auditLogs               AuditLog[]
+  id                      String                    @id @default(uuid())
+  email                   String                    @unique
+  password                String?
+  isEmailVerified         Boolean                   @default(false)
+  onboardingCompleted     Boolean                   @default(false)
+  profile                 UserProfile?
+  preferences             UserPreference?
+  oauthAccounts           OAuthAccount[]
+  languages               UserProgrammingLanguage[]
+  submissions             Submission[]
+  studySessions           StudySession[]
+  learningEvents          LearningEvent[]
+  roadmaps                Roadmap[]
+  recommendations         Recommendation[]
+  revisionTasks           RevisionTask[]
+  weaknessAnalyses        WeaknessAnalysis[]
+  readinessScores         ReadinessScore[]
+  topicProgress           UserTopicProgress[]
+  conceptProgress         UserConceptProgress[]
+  subscription            Subscription?
+  payments                Payment[]
+  mockOAAttempts          MockOAAttempt[]
+  notifications           Notification[]
+  notificationPreference  NotificationPreference?
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @updatedAt
+  featureUsages           FeatureUsage[]
+  promoRedemptions        PromoRedemption[]
+  aijobs                  AIJob[]
+  passwordResetTokens     PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
+  refreshTokens           RefreshToken[]
+  lastLoginAt             DateTime?
+  auditLogs               AuditLog[]
 
-    @@index([email])
+  @@index([email])
 }
 
 model OAuthAccount {
-    id                String       @id @default(uuid())
-    userId            String
-    provider          AuthProvider
-    providerAccountId String
-    user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-    createdAt         DateTime     @default(now())
+  id                String       @id @default(uuid())
+  userId            String
+  provider          AuthProvider
+  providerAccountId String
+  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime     @default(now())
 
-    @@unique([provider, providerAccountId])
-    @@index([userId])
+  @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model UserProfile {
-    userId           String          @id
-    displayName      String
-    avatarUrl        String?
-    experienceLevel  ExperienceLevel
-    leetcodeUsername String?
-    githubUsername   String?
-    user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-    createdAt        DateTime        @default(now())
-    updatedAt        DateTime        @updatedAt
+  userId           String          @id
+  displayName      String
+  username         String          @unique
+  avatarUrl        String?
+  experienceLevel  ExperienceLevel
+  leetcodeUsername String?
+  githubUsername   String?
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
 }
 
 model ProgrammingLanguage {
-    id              String                    @id @default(uuid())
-    name            String                    @unique
-    users           UserProgrammingLanguage[]
-    createdAt       DateTime                  @default(now())
-    updatedAt       DateTime                  @updatedAt
-    userPreferences UserPreference[]
-    submissions     Submission[]
+  id              String                    @id @default(uuid())
+  name            String                    @unique
+  users           UserProgrammingLanguage[]
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+  userPreferences UserPreference[]
+  submissions     Submission[]
 }
 
 model UserProgrammingLanguage {
-    userId     String
-    languageId String
-    user       User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-    language   ProgrammingLanguage @relation(fields: [languageId], references: [id], onDelete: Cascade)
-    createdAt  DateTime            @default(now())
-    updatedAt  DateTime            @updatedAt
+  userId     String
+  languageId String
+  user       User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  language   ProgrammingLanguage @relation(fields: [languageId], references: [id], onDelete: Cascade)
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
 
-    @@id([userId, languageId])
-    @@index([languageId])
+  @@id([userId, languageId])
+  @@index([languageId])
 }
 
 model UserPreference {
-    userId              String              @id
-    targetCompany       String[]
-    targetRole          String?
-    preferredLanguageId String?
-    dailyGoalMinutes    Int?                @default(60)
-    weeklyGoalProblems  Int?                @default(14)
-    user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-    preferredLanguage   ProgrammingLanguage? @relation(fields: [preferredLanguageId], references: [id], onDelete: Cascade)
-    createdAt           DateTime            @default(now())
-    updatedAt           DateTime            @updatedAt
+  userId              String               @id
+  targetCompany       String[]
+  targetRole          String?
+  preferredLanguageId String?
+  dailyGoalMinutes    Int?                 @default(60)
+  weeklyGoalProblems  Int?                 @default(14)
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  preferredLanguage   ProgrammingLanguage? @relation(fields: [preferredLanguageId], references: [id], onDelete: SetNull)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
 }
 
 model PasswordResetToken {
-    id        String    @id @default(uuid())
-    userId    String
-    tokenHash String    @unique
-    expiresAt DateTime
-    usedAt    DateTime?
-    user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-    createdAt DateTime  @default(now())
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
 
-    @@index([userId])
-    @@index([expiresAt])
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model EmailVerificationToken {
-    id        String    @id @default(uuid())
-    userId    String
-    tokenHash String    @unique
-    expiresAt DateTime
-    usedAt    DateTime?
-    user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-    createdAt DateTime  @default(now())
-    updatedAt DateTime  @updatedAt
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
-    @@index([userId])
+  @@index([userId])
 }
 
 model RefreshToken {
-    id        String    @id @default(uuid())
-    userId    String
-    tokenHash String    @unique
-    expiresAt DateTime
-    revokedAt DateTime?
-    user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-    createdAt DateTime  @default(now())
-    updatedAt DateTime  @updatedAt
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
-    @@index([userId])
+  @@index([userId])
 }
 
 model LoginAttempt {
-    id          String        @id @default(uuid())
-    email       String
-    ipAddress   String?
-    success     Boolean
-    reason      AttemptReason
-    attemptedAt DateTime      @default(now())
+  id          String        @id @default(uuid())
+  email       String
+  ipAddress   String?
+  success     Boolean
+  reason      AttemptReason
+  attemptedAt DateTime      @default(now())
 
-    @@index([email])
-    @@index([attemptedAt])
+  @@index([email])
+  @@index([attemptedAt])
 }
 
 model Problem {
-    id                   String               @id @default(uuid())
-    title                String
-    slug                 String               @unique
-    leetcodeQuestionId   Int                  @unique
-    problemUrl           String               @unique
-    difficulty           DifficultyLevel
-    estimatedTimeMinutes Int?
-    acceptanceRate       Float?
-    likes                Int?
-    dislikes             Int?
-    frequencyScore       Float?
-    topics               ProblemTopic[]
-    companies            ProblemCompany[]
-    submissions          Submission[]
-    learningEvents       LearningEvent[]
-    roadmapItems         RoadmapItemProblem[]
-    recommendations      Recommendation[]
-    concepts             ProblemConcept[]
-    createdAt            DateTime             @default(now())
-    updatedAt            DateTime             @updatedAt
+  id                   String               @id @default(uuid())
+  title                String
+  slug                 String               @unique
+  leetcodeQuestionId   Int                  @unique
+  problemUrl           String               @unique
+  difficulty           DifficultyLevel
+  estimatedTimeMinutes Int?
+  acceptanceRate       Float?
+  likes                Int?
+  dislikes             Int?
+  frequencyScore       Float?
+  topics               ProblemTopic[]
+  companies            ProblemCompany[]
+  submissions          Submission[]
+  learningEvents       LearningEvent[]
+  roadmapItems         RoadmapItemProblem[]
+  recommendations      Recommendation[]
+  concepts             ProblemConcept[]
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
 
-    @@index([difficulty])
-    @@index([frequencyScore])
+  @@index([difficulty])
+  @@index([frequencyScore])
 }
 
 model Topic {
-    id               String              @id @default(uuid())
-    name             String              @unique
-    slug             String              @unique
-    description      String?
-    concepts         TopicConcept[]
-    problems         ProblemTopic[]
-    progress         UserTopicProgress[]
-    weaknessAnalyses WeaknessAnalysis[]
-    revisionTasks    RevisionTask[]
-    recommendations  Recommendation[]
-    roadmapItems     RoadmapItem[]
-    createdAt        DateTime            @default(now())
-    updatedAt        DateTime            @updatedAt
+  id               String              @id @default(uuid())
+  name             String              @unique
+  slug             String              @unique
+  description      String?
+  concepts         TopicConcept[]
+  problems         ProblemTopic[]
+  progress         UserTopicProgress[]
+  weaknessAnalyses WeaknessAnalysis[]
+  revisionTasks    RevisionTask[]
+  recommendations  Recommendation[]
+  roadmapItems     RoadmapItem[]
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
 }
 
 model Company {
-    id          String           @id @default(uuid())
-    name        String           @unique
-    websiteUrl  String?
-    problems    ProblemCompany[]
-    createdAt   DateTime         @default(now())
-    updatedAt   DateTime         @updatedAt
-    mockOATests MockOATest[]
+  id          String           @id @default(uuid())
+  name        String           @unique
+  websiteUrl  String?
+  problems    ProblemCompany[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  mockOATests MockOATest[]
 }
 
 model ProblemTopic {
-    problemId String
-    topicId   String
-    problem   Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
-    topic     Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  problemId String
+  topicId   String
+  problem   Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  topic     Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@id([problemId, topicId])
-    @@index([topicId])
+  @@id([problemId, topicId])
+  @@index([topicId])
 }
 
 model ProblemCompany {
-    problemId String
-    companyId String
-    frequency Float?
-    problem   Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
-    company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  problemId String
+  companyId String
+  frequency Float?
+  problem   Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@id([problemId, companyId])
-    @@index([companyId])
+  @@id([problemId, companyId])
+  @@index([companyId])
 }
 
 model Concept {
-    id                    String                @id @default(uuid())
-    name                  String                @unique
-    slug                  String                @unique
-    description           String?
-    topics                TopicConcept[]
-    problems              ProblemConcept[]
-    createdAt             DateTime              @default(now())
-    updatedAt             DateTime              @updatedAt
-    userConceptProgresses UserConceptProgress[]
-    roadmapItems          RoadmapItem[]
-    weaknessAnalyses      WeaknessAnalysis[]
-    revisionTasks         RevisionTask[]
-    recommendations       Recommendation[]
+  id                    String                @id @default(uuid())
+  name                  String                @unique
+  slug                  String                @unique
+  description           String?
+  topics                TopicConcept[]
+  problems              ProblemConcept[]
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  userConceptProgresses UserConceptProgress[]
+  roadmapItems          RoadmapItem[]
+  weaknessAnalyses      WeaknessAnalysis[]
+  revisionTasks         RevisionTask[]
+  recommendations       Recommendation[]
 }
 
 model ProblemConcept {
-    problemId String
-    conceptId String
-    problem   Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
-    concept   Concept  @relation(fields: [conceptId], references: [id], onDelete: Cascade)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  problemId String
+  conceptId String
+  problem   Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  concept   Concept  @relation(fields: [conceptId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@id([problemId, conceptId])
-    @@index([conceptId])
+  @@id([problemId, conceptId])
+  @@index([conceptId])
 }
 
 model TopicConcept {
-    topicId   String
-    conceptId String
-    topic     Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
-    concept   Concept  @relation(fields: [conceptId], references: [id], onDelete: Cascade)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  topicId   String
+  conceptId String
+  topic     Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  concept   Concept  @relation(fields: [conceptId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@id([topicId, conceptId])
-    @@index([conceptId])
+  @@id([topicId, conceptId])
+  @@index([conceptId])
 }
 
 model Submission {
-    id               String              @id @default(uuid())
-    userId           String
-    problemId        String
-    status           SubmissionStatus
-    languageId       String?
-    runtime          Int?
-    memory           Int?
-    attempts         Int                 @default(1)
-    solveTimeMinutes Int?
-    submittedAt      DateTime
-    user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-    problem          Problem             @relation(fields: [problemId], references: [id], onDelete: Cascade)
-    language         ProgrammingLanguage? @relation(fields: [languageId], references: [id], onDelete: Cascade)
-    createdAt        DateTime            @default(now())
-    updatedAt        DateTime            @updatedAt
+  id               String               @id @default(uuid())
+  userId           String
+  problemId        String
+  status           SubmissionStatus
+  languageId       String?
+  runtime          Int?
+  memory           Int?
+  attempts         Int                  @default(1)
+  solveTimeMinutes Int?
+  submittedAt      DateTime
+  user             User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem          Problem              @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  language         ProgrammingLanguage? @relation(fields: [languageId], references: [id], onDelete: Cascade)
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
 
-    @@index([userId])
-    @@index([problemId])
-    @@index([submittedAt])
+  @@index([userId])
+  @@index([problemId])
+  @@index([submittedAt])
 }
 
 model StudySession {
-    id                String          @id @default(uuid())
-    userId            String
-    startedAt         DateTime
-    endedAt           DateTime?
-    durationMinutes   Int?
-    problemsSolved    Int
-    problemsAttempted Int
-    learningEvents    LearningEvent[]
-    problemsRevised   Int             @default(0)
-    user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-    createdAt         DateTime        @default(now())
-    updatedAt         DateTime        @updatedAt
+  id                String          @id @default(uuid())
+  userId            String
+  startedAt         DateTime
+  endedAt           DateTime?
+  durationMinutes   Int?
+  problemsSolved    Int
+  problemsAttempted Int
+  learningEvents    LearningEvent[]
+  problemsRevised   Int             @default(0)
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
 
-    @@index([userId])
+  @@index([userId])
 }
 
 model UserTopicProgress {
-    userId            String
-    topicId           String
-    solvedProblems    Int
-    attemptedProblems Int
-    averageSolveTime  Float?
-    masteryScore      Float?
-    lastSolvedAt      DateTime?
-    revisionDueAt     DateTime?
-    user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-    topic             Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
-    createdAt         DateTime  @default(now())
-    updatedAt         DateTime  @updatedAt
+  userId            String
+  topicId           String
+  solvedProblems    Int
+  attemptedProblems Int
+  averageSolveTime  Float?
+  masteryScore      Float?
+  lastSolvedAt      DateTime?
+  revisionDueAt     DateTime?
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic             Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
-    @@id([userId, topicId])
+  @@id([userId, topicId])
 }
 
 model UserConceptProgress {
-    userId            String
-    conceptId         String
-    solvedProblems    Int       @default(0)
-    attemptedProblems Int       @default(0)
-    averageSolveTime  Float?
-    masteryScore      Float?
-    lastSolvedAt      DateTime?
-    revisionDueAt     DateTime?
-    user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-    concept           Concept   @relation(fields: [conceptId], references: [id], onDelete: Cascade)
-    createdAt         DateTime  @default(now())
-    updatedAt         DateTime  @updatedAt
+  userId            String
+  conceptId         String
+  solvedProblems    Int       @default(0)
+  attemptedProblems Int       @default(0)
+  averageSolveTime  Float?
+  masteryScore      Float?
+  lastSolvedAt      DateTime?
+  revisionDueAt     DateTime?
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  concept           Concept   @relation(fields: [conceptId], references: [id], onDelete: Cascade)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
-    @@id([userId, conceptId])
-    @@index([conceptId])
+  @@id([userId, conceptId])
+  @@index([conceptId])
 }
 
 model LearningEvent {
-    id           String            @id @default(uuid())
-    userId       String
-    problemId    String
-    sessionId    String?
-    type         LearningEventType
-    metadata     Json?
-    occurredAt   DateTime          @default(now())
-    studySession StudySession?     @relation(fields: [sessionId], references: [id], onDelete: SetNull)
-    user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-    problem      Problem           @relation(fields: [problemId], references: [id], onDelete: Cascade)
-    createdAt    DateTime          @default(now())
-    updatedAt    DateTime          @updatedAt
+  id           String            @id @default(uuid())
+  userId       String
+  problemId    String
+  sessionId    String?
+  type         LearningEventType
+  metadata     Json?
+  occurredAt   DateTime          @default(now())
+  studySession StudySession?     @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem      Problem           @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
 
-    @@index([userId, type])
-    @@index([problemId, type])
-    @@index([userId, occurredAt])
+  @@index([userId, type])
+  @@index([problemId, type])
+  @@index([userId, occurredAt])
 }
 
 model Roadmap {
-    id                     String        @id @default(uuid())
-    userId                 String
-    title                  String
-    description            String?
-    targetCompany          String?
-    targetRole             String?
-    estimatedDurationWeeks Int?
-    status                 RoadmapStatus @default(ACTIVE)
-    user                   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-    items                  RoadmapItem[]
-    createdAt              DateTime      @default(now())
-    updatedAt              DateTime      @updatedAt
+  id                     String        @id @default(uuid())
+  userId                 String
+  title                  String
+  description            String?
+  targetCompany          String?
+  targetRole             String?
+  estimatedDurationWeeks Int?
+  status                 RoadmapStatus @default(ACTIVE)
+  user                   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items                  RoadmapItem[]
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
 
-    @@index([userId])
+  @@index([userId])
 }
 
 model RoadmapItem {
-    id             String               @id @default(uuid())
-    roadmapId      String
-    type           RoadmapItemType
-    topicId        String?
-    conceptId      String?
-    title          String
-    description    String?
-    displayOrder   Int
-    estimatedHours Int?
-    status         RoadmapItemsStatus   @default(NOT_STARTED)
-    roadmap        Roadmap              @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
-    topic          Topic?               @relation(fields: [topicId], references: [id], onDelete: Cascade)
-    concept        Concept?             @relation(fields: [conceptId], references: [id], onDelete: Cascade)
-    problems       RoadmapItemProblem[]
-    createdAt      DateTime             @default(now())
-    updatedAt      DateTime             @updatedAt
+  id             String               @id @default(uuid())
+  roadmapId      String
+  type           RoadmapItemType
+  topicId        String?
+  conceptId      String?
+  title          String
+  description    String?
+  displayOrder   Int
+  estimatedHours Int?
+  status         RoadmapItemsStatus   @default(NOT_STARTED)
+  roadmap        Roadmap              @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  topic          Topic?               @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  concept        Concept?             @relation(fields: [conceptId], references: [id], onDelete: Cascade)
+  problems       RoadmapItemProblem[]
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
 
-    @@index([roadmapId])
-    @@index([topicId])
-    @@index([conceptId])
+  @@index([roadmapId])
+  @@index([topicId])
+  @@index([conceptId])
 }
 
 model RoadmapItemProblem {
-    roadmapItemId String
-    problemId     String
-    isRequired    Boolean     @default(true)
-    order         Int
-    roadmapItem   RoadmapItem @relation(fields: [roadmapItemId], references: [id], onDelete: Cascade)
-    problem       Problem     @relation(fields: [problemId], references: [id], onDelete: Cascade)
-    createdAt     DateTime    @default(now())
-    updatedAt     DateTime    @updatedAt
+  roadmapItemId String
+  problemId     String
+  isRequired    Boolean     @default(true)
+  order         Int
+  roadmapItem   RoadmapItem @relation(fields: [roadmapItemId], references: [id], onDelete: Cascade)
+  problem       Problem     @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 
-    @@id([roadmapItemId, problemId])
-    @@index([problemId])
+  @@id([roadmapItemId, problemId])
+  @@index([problemId])
 }
 
 model WeaknessAnalysis {
-    id            String   @id @default(uuid())
-    userId        String
-    topicId       String?
-    conceptId     String?
-    weaknessScore Float
-    confidence    Float?
-    analyzedAt    DateTime @default(now())
-    user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    topic         Topic?   @relation(fields: [topicId], references: [id], onDelete: SetNull)
-    concept       Concept? @relation(fields: [conceptId], references: [id], onDelete: SetNull)
-    createdAt     DateTime @default(now())
-    updatedAt     DateTime @updatedAt
+  id            String   @id @default(uuid())
+  userId        String
+  topicId       String?
+  conceptId     String?
+  weaknessScore Float
+  confidence    Float?
+  analyzedAt    DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic         Topic?   @relation(fields: [topicId], references: [id], onDelete: SetNull)
+  concept       Concept? @relation(fields: [conceptId], references: [id], onDelete: SetNull)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-    @@index([userId])
-    @@index([topicId])
-    @@index([conceptId])
+  @@index([userId])
+  @@index([topicId])
+  @@index([conceptId])
 }
 
 model RevisionTask {
-    id           String         @id @default(uuid())
-    userId       String
-    topicId      String?
-    conceptId    String?
-    scheduledFor DateTime
-    status       RevisionStatus @default(PENDING)
-    priority     Int            @default(1)
-    user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-    topic        Topic?         @relation(fields: [topicId], references: [id], onDelete: SetNull)
-    concept      Concept?       @relation(fields: [conceptId], references: [id], onDelete: SetNull)
-    createdAt    DateTime       @default(now())
-    updatedAt    DateTime       @updatedAt
+  id           String         @id @default(uuid())
+  userId       String
+  topicId      String?
+  conceptId    String?
+  scheduledFor DateTime
+  status       RevisionStatus @default(PENDING)
+  priority     Int            @default(1)
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic        Topic?         @relation(fields: [topicId], references: [id], onDelete: SetNull)
+  concept      Concept?       @relation(fields: [conceptId], references: [id], onDelete: SetNull)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 
-    @@index([userId])
-    @@index([scheduledFor])
+  @@index([userId])
+  @@index([scheduledFor])
 }
 
 model ReadinessScore {
-    id                    String   @id @default(uuid())
-    userId                String
-    overallScore          Float
-    dsaScore              Float
-    consistencyScore      Float
-    revisionScore         Float
-    companyReadinessScore Float?
-    confidence            Float?
-    calculatedAt          DateTime
-    user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    createdAt             DateTime @default(now())
-    updatedAt             DateTime @updatedAt
+  id                    String   @id @default(uuid())
+  userId                String
+  overallScore          Float
+  dsaScore              Float
+  consistencyScore      Float
+  revisionScore         Float
+  companyReadinessScore Float?
+  confidence            Float?
+  calculatedAt          DateTime
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
-    @@index([userId, calculatedAt])
+  @@index([userId, calculatedAt])
 }
 
 model Recommendation {
-    id          String             @id @default(uuid())
-    userId      String
-    type        RecommendationType
-    problemId   String?
-    topicId     String?
-    conceptId   String?
-    score       Float
-    reasonCode  String?
-    isAccepted  Boolean?
-    generatedAt DateTime
-    expiresAt   DateTime?
-    user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-    problem     Problem?           @relation(fields: [problemId], references: [id], onDelete: SetNull)
-    topic       Topic?             @relation(fields: [topicId], references: [id], onDelete: SetNull)
-    concept     Concept?           @relation(fields: [conceptId], references: [id], onDelete: SetNull)
-    createdAt   DateTime           @default(now())
-    updatedAt   DateTime           @updatedAt
+  id          String             @id @default(uuid())
+  userId      String
+  type        RecommendationType
+  problemId   String?
+  topicId     String?
+  conceptId   String?
+  score       Float
+  reasonCode  String?
+  isAccepted  Boolean?
+  generatedAt DateTime
+  expiresAt   DateTime?
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem     Problem?           @relation(fields: [problemId], references: [id], onDelete: SetNull)
+  topic       Topic?             @relation(fields: [topicId], references: [id], onDelete: SetNull)
+  concept     Concept?           @relation(fields: [conceptId], references: [id], onDelete: SetNull)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
 
-    @@index([userId])
-    @@index([generatedAt])
+  @@index([userId])
+  @@index([generatedAt])
 }
 
 model Subscription {
-    id                     String             @id @default(uuid())
-    userId                 String             @unique
-    tier                   SubscriptionTier   @default(FREE)
-    billingCycle           BillingCycle?
-    status                 SubscriptionStatus @default(ACTIVE)
-    razorpaySubscriptionId String?            @unique
-    currentPeriodStart     DateTime?
-    currentPeriodEnd       DateTime?
-    cancelledAt            DateTime?
-    user                   User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-    createdAt              DateTime           @default(now())
-    updatedAt              DateTime           @updatedAt
-    payments               Payment[]
+  id                     String             @id @default(uuid())
+  userId                 String             @unique
+  tier                   SubscriptionTier   @default(FREE)
+  billingCycle           BillingCycle?
+  status                 SubscriptionStatus @default(ACTIVE)
+  razorpaySubscriptionId String?            @unique
+  currentPeriodStart     DateTime?
+  currentPeriodEnd       DateTime?
+  cancelledAt            DateTime?
+  user                   User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+  payments               Payment[]
 
-    @@index([userId])
-    @@index([status])
+  @@index([userId])
+  @@index([status])
 }
 
 model Payment {
-    id                String           @id @default(uuid())
-    userId            String
-    planId            String?
-    subscriptionId    String?
-    provider          PaymentProvider
-    razorpayOrderId   String           @unique
-    razorpayPaymentId String?          @unique
-    razorpaySignature String?
-    originalAmount    Decimal          @db.Decimal(10, 2)
-    discountAmount    Decimal          @default(0) @db.Decimal(10, 2)
-    finalAmount       Decimal          @db.Decimal(10, 2)
-    taxAmount         Decimal
-    currency          String           @default("INR")
-    status            PaymentStatus
-    paidAt            DateTime?
-    refundedAt        DateTime?
-    promoRedemption   PromoRedemption?
-    failureReason     String?
-    invoiceNumber     String?
-    paymentMethod     PaymentMethod
-    receiptId         String?
-    user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-    subscription      Subscription?    @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
-    plan              Plan?            @relation(fields: [planId], references: [id])
-    createdAt         DateTime         @default(now())
-    updatedAt         DateTime         @updatedAt
+  id                String           @id @default(uuid())
+  userId            String
+  planId            String?
+  subscriptionId    String?
+  provider          PaymentProvider
+  razorpayOrderId   String           @unique
+  razorpayPaymentId String?          @unique
+  razorpaySignature String?
+  originalAmount    Decimal          @db.Decimal(10, 2)
+  discountAmount    Decimal          @default(0) @db.Decimal(10, 2)
+  finalAmount       Decimal          @db.Decimal(10, 2)
+  taxAmount         Decimal
+  currency          String           @default("INR")
+  status            PaymentStatus
+  paidAt            DateTime?
+  refundedAt        DateTime?
+  promoRedemption   PromoRedemption?
+  failureReason     String?
+  invoiceNumber     String?
+  paymentMethod     PaymentMethod
+  receiptId         String?
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription      Subscription?    @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  plan              Plan?            @relation(fields: [planId], references: [id])
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
 
-    @@index([userId])
-    @@index([paidAt])
-    @@index([provider])
-    @@index([subscriptionId])
+  @@index([userId])
+  @@index([paidAt])
+  @@index([provider])
+  @@index([subscriptionId])
 }
 
 model Plan {
-    id             String           @id @default(uuid())
-    name           String           @unique
-    description    String?
-    tier           SubscriptionTier
-    billingCycle   BillingCycle?
-    price          Decimal          @db.Decimal(10, 2)
-    currency       String           @default("INR")
-    durationMonths Int
-    features       Json
-    isActive       Boolean          @default(true)
-    createdAt      DateTime         @default(now())
-    updatedAt      DateTime         @updatedAt
-    payments       Payment[]
+  id             String           @id @default(uuid())
+  name           String           @unique
+  description    String?
+  tier           SubscriptionTier
+  billingCycle   BillingCycle?
+  price          Decimal          @db.Decimal(10, 2)
+  currency       String           @default("INR")
+  durationMonths Int
+  features       Json
+  isActive       Boolean          @default(true)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  payments       Payment[]
 
-    @@index([tier, billingCycle])
+  @@index([tier, billingCycle])
 }
 
 model FeatureUsage {
-    id         String    @id @default(uuid())
-    userId     String
-    featureKey String
-    usageCount Int       @default(0)
-    resetAt    DateTime
-    lastUsedAt DateTime?
-    user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-    createdAt  DateTime  @default(now())
-    updatedAt  DateTime  @updatedAt
+  id         String    @id @default(uuid())
+  userId     String
+  featureKey String
+  usageCount Int       @default(0)
+  resetAt    DateTime
+  lastUsedAt DateTime?
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
-    @@unique([userId, featureKey])
-    @@index([resetAt])
+  @@unique([userId, featureKey])
+  @@index([resetAt])
 }
 
 model PromoCode {
-    id              String            @id @default(uuid())
-    code            String            @unique
-    description     String?
-    discountType    DiscountType
-    maxDiscount     Decimal?          @db.Decimal(10, 2)
-    discountValue   Decimal           @db.Decimal(10, 2)
-    validFrom       DateTime
-    validUntil      DateTime
-    usageLimit      Int?
-    usageCount      Int               @default(0)
-    minimumPurchase Decimal?          @db.Decimal(10, 2)
-    isActive        Boolean           @default(true)
-    redemptions     PromoRedemption[]
-    createdAt       DateTime          @default(now())
-    updatedAt       DateTime          @updatedAt
+  id              String            @id @default(uuid())
+  code            String            @unique
+  description     String?
+  discountType    DiscountType
+  maxDiscount     Decimal?          @db.Decimal(10, 2)
+  discountValue   Decimal           @db.Decimal(10, 2)
+  validFrom       DateTime
+  validUntil      DateTime
+  usageLimit      Int?
+  usageCount      Int               @default(0)
+  minimumPurchase Decimal?          @db.Decimal(10, 2)
+  isActive        Boolean           @default(true)
+  redemptions     PromoRedemption[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
 
-    @@index([code])
-    @@index([validUntil])
+  @@index([code])
+  @@index([validUntil])
 }
 
 model PromoRedemption {
-    id             String    @id @default(uuid())
-    promoCodeId    String
-    paymentId      String    @unique
-    userId         String
-    discountAmount Decimal   @db.Decimal(10, 2)
-    redeemedAt     DateTime  @default(now())
-    promoCode      PromoCode @relation(fields: [promoCodeId], references: [id])
-    payment        Payment   @relation(fields: [paymentId], references: [id])
-    user           User      @relation(fields: [userId], references: [id])
+  id             String    @id @default(uuid())
+  promoCodeId    String
+  paymentId      String    @unique
+  userId         String
+  discountAmount Decimal   @db.Decimal(10, 2)
+  redeemedAt     DateTime  @default(now())
+  promoCode      PromoCode @relation(fields: [promoCodeId], references: [id])
+  payment        Payment   @relation(fields: [paymentId], references: [id])
+  user           User      @relation(fields: [userId], references: [id])
 
-    @@unique([promoCodeId, userId])
-    @@index([userId])
-    @@index([promoCodeId])
-    @@index([paymentId])
+  @@unique([promoCodeId, userId])
+  @@index([userId])
+  @@index([promoCodeId])
+  @@index([paymentId])
 }
 
 model Notification {
-    id                     String                 @id @default(uuid())
-    userId                 String
-    title                  String
-    message                String
-    type                   NotificationType
-    priority               NotificationPriority
-    isRead                 Boolean                @default(false)
-    actionUrl              String?
-    metadata               Json?
-    scheduledFor           DateTime?
-    sentAt                 DateTime?
-    readAt                 DateTime?
-    expiresAt              DateTime?
-    user                   User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-    createdAt              DateTime               @default(now())
-    updatedAt              DateTime               @updatedAt
-    notificationDeliveries NotificationDelivery[]
+  id                     String                 @id @default(uuid())
+  userId                 String
+  title                  String
+  message                String
+  type                   NotificationType
+  priority               NotificationPriority
+  isRead                 Boolean                @default(false)
+  actionUrl              String?
+  metadata               Json?
+  scheduledFor           DateTime?
+  sentAt                 DateTime?
+  readAt                 DateTime?
+  expiresAt              DateTime?
+  user                   User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt              DateTime               @default(now())
+  updatedAt              DateTime               @updatedAt
+  notificationDeliveries NotificationDelivery[]
 
-    @@index([userId, createdAt])
-    @@index([userId, isRead])
-    @@index([scheduledFor, sentAt])
-    @@index([expiresAt])
+  @@index([userId, createdAt])
+  @@index([userId, isRead])
+  @@index([scheduledFor, sentAt])
+  @@index([expiresAt])
 }
 
 model NotificationPreference {
-    userId                     String   @id
-    emailEnabled               Boolean  @default(true)
-    inAppEnabled               Boolean  @default(true)
-    revisionNotification       Boolean  @default(true)
-    roadmapNotification        Boolean  @default(true)
-    dailyGoalNotification      Boolean  @default(true)
-    weeklyReportNotification   Boolean  @default(true)
-    recommendationNotification Boolean  @default(true)
-    paymentNotification        Boolean  @default(true)
-    marketingNotification      Boolean  @default(true)
-    quietHoursStart            Int?
-    quietHoursEnd              Int?
-    user                       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    createdAt                  DateTime @default(now())
-    updatedAt                  DateTime @updatedAt
+  userId                     String   @id
+  emailEnabled               Boolean  @default(true)
+  inAppEnabled               Boolean  @default(true)
+  revisionNotification       Boolean  @default(true)
+  roadmapNotification        Boolean  @default(true)
+  dailyGoalNotification      Boolean  @default(true)
+  weeklyReportNotification   Boolean  @default(true)
+  recommendationNotification Boolean  @default(true)
+  paymentNotification        Boolean  @default(true)
+  marketingNotification      Boolean  @default(true)
+  quietHoursStart            Int?
+  quietHoursEnd              Int?
+  user                       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
 
-    @@index([userId])
+  @@index([userId])
 }
 
 model NotificationDelivery {
-    id             String              @id @default(uuid())
-    notificationId String
-    channel        NotificationChannel
-    status         DeliveryStatus
-    failureReason  String?
-    deliveredAt    DateTime?
-    attempts       Int                 @default(0)
-    notification   Notification        @relation(fields: [notificationId], references: [id], onDelete: Cascade)
-    createdAt      DateTime            @default(now())
-    updatedAt      DateTime            @updatedAt
+  id             String              @id @default(uuid())
+  notificationId String
+  channel        NotificationChannel
+  status         DeliveryStatus
+  failureReason  String?
+  deliveredAt    DateTime?
+  attempts       Int                 @default(0)
+  notification   Notification        @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
 
-    @@index([notificationId])
-    @@index([status])
+  @@index([notificationId])
+  @@index([status])
 }
 
 model MockOATest {
-    id               String           @id @default(uuid())
-    companyId        String?
-    title            String
-    description      String?
-    durationMinutes  Int
-    totalMarks       Float
-    totalQuestions   Int
-    passingMarks     Float?
-    subscriptionTier SubscriptionTier @default(PRO)
-    isPublished      Boolean          @default(false)
-    attempts         MockOAAttempt[]
-    questions        MockOAQuestion[]
-    company          Company?         @relation(fields: [companyId], references: [id], onDelete: SetNull)
-    createdAt        DateTime         @default(now())
-    updatedAt        DateTime         @updatedAt
+  id               String           @id @default(uuid())
+  companyId        String?
+  title            String
+  description      String?
+  durationMinutes  Int
+  totalMarks       Float
+  totalQuestions   Int
+  passingMarks     Float?
+  subscriptionTier SubscriptionTier @default(PRO)
+  isPublished      Boolean          @default(false)
+  attempts         MockOAAttempt[]
+  questions        MockOAQuestion[]
+  company          Company?         @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 
-    @@unique([companyId, title])
-    @@index([companyId])
-    @@index([subscriptionTier])
+  @@unique([companyId, title])
+  @@index([companyId])
+  @@index([subscriptionTier])
 }
 
 model MockOAQuestion {
-    id               String                 @id @default(uuid())
-    documentId       String
-    marks            Float
-    negativeMarks    Float                  @default(0)
-    displayOrder     Int
-    testId           String
-    estimatedMinutes Int?
-    tags             MockOAQuestionTag[]
-    results          MockOAQuestionResult[]
-    test             MockOATest             @relation(fields: [testId], references: [id], onDelete: Cascade)
-    createdAt        DateTime               @default(now())
-    updatedAt        DateTime               @updatedAt
+  id               String                 @id @default(uuid())
+  documentId       String
+  marks            Float
+  negativeMarks    Float                  @default(0)
+  displayOrder     Int
+  testId           String
+  estimatedMinutes Int?
+  tags             MockOAQuestionTag[]
+  results          MockOAQuestionResult[]
+  test             MockOATest             @relation(fields: [testId], references: [id], onDelete: Cascade)
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
 
-    @@unique([testId, displayOrder])
-    @@index([testId])
-    @@index([displayOrder])
+  @@unique([testId, displayOrder])
+  @@index([testId])
+  @@index([displayOrder])
 }
 
 model MockOATag {
-    id        String              @id @default(uuid())
-    name      String              @unique
-    questions MockOAQuestionTag[]
-    createdAt DateTime            @default(now())
-    updatedAt DateTime            @updatedAt
+  id        String              @id @default(uuid())
+  name      String              @unique
+  questions MockOAQuestionTag[]
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
 }
 
 model MockOAQuestionTag {
-    questionId String
-    tagId      String
-    question   MockOAQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
-    tag        MockOATag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
-    createdAt  DateTime       @default(now())
-    updatedAt  DateTime       @updatedAt
+  questionId String
+  tagId      String
+  question   MockOAQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  tag        MockOATag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
 
-    @@id([questionId, tagId])
-    @@index([tagId])
+  @@id([questionId, tagId])
+  @@index([tagId])
 }
 
 model MockOAAttempt {
-    id               String                 @id @default(uuid())
-    userId           String
-    testId           String
-    status           MockOAAttemptStatus
-    startedAt        DateTime
-    endedAt          DateTime?
-    submittedAt      DateTime?
-    durationSeconds  Int?
-    selectedLanguage MockOALanguage
-    totalScore       Float                  @default(0)
-    maxScore         Float
-    percentile       Float?
-    passed           Boolean?
-    attemptNumber    Int
-    browserInfo      String
-    ip               String
-    isAIAnalyzed     Boolean                @default(false)
-    user             User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-    test             MockOATest             @relation(fields: [testId], references: [id], onDelete: Cascade)
-    questionResults  MockOAQuestionResult[]
-    aiSummary        MockOAAISummary?
-    createdAt        DateTime               @default(now())
-    updatedAt        DateTime               @updatedAt
+  id               String                 @id @default(uuid())
+  userId           String
+  testId           String
+  status           MockOAAttemptStatus
+  startedAt        DateTime
+  endedAt          DateTime?
+  submittedAt      DateTime?
+  durationSeconds  Int?
+  selectedLanguage MockOALanguage
+  totalScore       Float                  @default(0)
+  maxScore         Float
+  percentile       Float?
+  passed           Boolean?
+  attemptNumber    Int
+  browserInfo      String
+  ip               String
+  isAIAnalyzed     Boolean                @default(false)
+  user             User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  test             MockOATest             @relation(fields: [testId], references: [id], onDelete: Cascade)
+  questionResults  MockOAQuestionResult[]
+  aiSummary        MockOAAISummary?
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
 
-    @@unique([userId, testId, attemptNumber])
-    @@index([userId])
-    @@index([testId])
-    @@index([status])
+  @@unique([userId, testId, attemptNumber])
+  @@index([userId])
+  @@index([testId])
+  @@index([status])
 }
 
 model MockOAQuestionResult {
-    id                   String           @id @default(uuid())
-    attemptId            String
-    questionId           String
-    score                Float
-    maxScore             Float
-    passed               Boolean
-    runtimeMs            Int?
-    memoryKb             Int?
-    timeSpentSeconds     Int?
-    totalSubmissions     Int              @default(1)
-    finalVerdict         SubmissionStatus
-    codeDocumentId       String?
-    evaluationDocumentId String?
-    attempt              MockOAAttempt    @relation(fields: [attemptId], references: [id], onDelete: Cascade)
-    question             MockOAQuestion   @relation(fields: [questionId], references: [id], onDelete: Cascade)
-    createdAt            DateTime         @default(now())
-    updatedAt            DateTime         @updatedAt
+  id                   String           @id @default(uuid())
+  attemptId            String
+  questionId           String
+  score                Float
+  maxScore             Float
+  passed               Boolean
+  runtimeMs            Int?
+  memoryKb             Int?
+  timeSpentSeconds     Int?
+  totalSubmissions     Int              @default(1)
+  finalVerdict         SubmissionStatus
+  codeDocumentId       String?
+  evaluationDocumentId String?
+  attempt              MockOAAttempt    @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question             MockOAQuestion   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
 
-    @@unique([attemptId, questionId])
-    @@index([attemptId])
-    @@index([questionId])
+  @@unique([attemptId, questionId])
+  @@index([attemptId])
+  @@index([questionId])
 }
 
 model MockOAAISummary {
-    id                          String                @id @default(uuid())
-    attemptId                   String                @unique
-    overallScore                Float
-    codingScore                 Float
-    problemSolvingScore         Float
-    codeQualityScore            Float
-    timeManagementScore         Float
-    algorithmSelectionScore     Float
-    debuggingScore              Float
-    optimizationScore           Float
-    strengths                   String[]
-    weaknesses                  String[]
-    improvementAreas            String[]
-    recommendedTopics           String[]
-    recommendedProblemIds       String[]
-    hiringRecommendation        HiringRecommendation?
-    estimatedInterviewReadiness Float?
-    analysisDocumentId          String?
-    attempt                     MockOAAttempt         @relation(fields: [attemptId], references: [id], onDelete: Cascade)
-    createdAt                   DateTime              @default(now())
-    updatedAt                   DateTime              @updatedAt
+  id                          String                @id @default(uuid())
+  attemptId                   String                @unique
+  overallScore                Float
+  codingScore                 Float
+  problemSolvingScore         Float
+  codeQualityScore            Float
+  timeManagementScore         Float
+  algorithmSelectionScore     Float
+  debuggingScore              Float
+  optimizationScore           Float
+  strengths                   String[]
+  weaknesses                  String[]
+  improvementAreas            String[]
+  recommendedTopics           String[]
+  recommendedProblemIds       String[]
+  hiringRecommendation        HiringRecommendation?
+  estimatedInterviewReadiness Float?
+  analysisDocumentId          String?
+  attempt                     MockOAAttempt         @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  createdAt                   DateTime              @default(now())
+  updatedAt                   DateTime              @updatedAt
 }
 
 model AIJob {
-    id           String      @id @default(uuid())
-    userId       String
-    jobType      AIJobType
-    status       AIJobStatus @default(QUEUED)
-    createdAt    DateTime    @default(now())
-    startedAt    DateTime?
-    completedAt  DateTime?
-    errorMessage String?
-    metadata     Json?
-    user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-    aijobLogs    AIJobLog[]
+  id           String      @id @default(uuid())
+  userId       String
+  jobType      AIJobType
+  status       AIJobStatus @default(QUEUED)
+  createdAt    DateTime    @default(now())
+  startedAt    DateTime?
+  completedAt  DateTime?
+  errorMessage String?
+  metadata     Json?
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  aijobLogs    AIJobLog[]
 
-    @@index([userId])
-    @@index([status])
+  @@index([userId])
+  @@index([status])
 }
 
 model AuditLog {
-    id        String      @id @default(uuid())
-    userId    String?
-    action    AuditAction
-    entity    String
-    entityId  String
-    oldValues Json?
-    newValues Json?
-    ipAddress String?
-    user      User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
-    createdAt DateTime    @default(now())
+  id        String      @id @default(uuid())
+  userId    String?
+  action    AuditAction
+  entity    String
+  entityId  String
+  oldValues Json?
+  newValues Json?
+  ipAddress String?
+  user      User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt DateTime    @default(now())
 
-    @@index([userId])
-    @@index([entity, entityId])
-    @@index([action])
-    @@index([createdAt])
+  @@index([userId])
+  @@index([entity, entityId])
+  @@index([action])
+  @@index([createdAt])
 }
 
 model SystemLog {
-    id         String   @id @default(uuid())
-    level      LogLevel
-    service    String
-    endpoint   String?
-    method     String?
-    message    String
-    stackTrace String?
-    requestId  String?
-    userId     String?
-    ipAddress  String?
-    metadata   Json?
-    createdAt  DateTime @default(now())
+  id         String   @id @default(uuid())
+  level      LogLevel
+  service    String
+  endpoint   String?
+  method     String?
+  message    String
+  stackTrace String?
+  requestId  String?
+  userId     String?
+  ipAddress  String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
 
-    @@index([level])
-    @@index([service])
-    @@index([createdAt])
-    @@index([requestId])
+  @@index([level])
+  @@index([service])
+  @@index([createdAt])
+  @@index([requestId])
 }
 
 model RequestLog {
-    id         String   @id @default(uuid())
-    requestId  String   @unique
-    userId     String?
-    method     String
-    endpoint   String
-    statusCode Int
-    durationMs Int
-    ipAddress  String?
-    createdAt  DateTime @default(now())
+  id         String   @id @default(uuid())
+  requestId  String   @unique
+  userId     String?
+  method     String
+  endpoint   String
+  statusCode Int
+  durationMs Int
+  ipAddress  String?
+  createdAt  DateTime @default(now())
 
-    @@index([endpoint])
-    @@index([statusCode])
-    @@index([createdAt])
+  @@index([endpoint])
+  @@index([statusCode])
+  @@index([createdAt])
 }
 
 model AIJobLog {
-    id        String   @id @default(uuid())
-    jobId     String
-    aiJob     AIJob    @relation(fields: [jobId], references: [id], onDelete: Cascade)
-    message   String
-    metadata  Json?
-    createdAt DateTime @default(now())
+  id        String   @id @default(uuid())
+  jobId     String
+  aiJob     AIJob    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  message   String
+  metadata  Json?
+  createdAt DateTime @default(now())
 
-    @@index([jobId])
+  @@index([jobId])
 }

@@ -14,6 +14,8 @@ import { notFound } from "./middleware/notFound.middleware";
 import { apiLimiter } from "./middleware/rateLimiter.middleware";
 import { requestLogger } from "./middleware/requestLogger.middleware";
 import authRoutes from "./modules/auth/auth.routes";
+import onboardingRoutes from "./modules/onboarding/onboarding.routes";
+import profileRoutes from "./modules/profile/profile.routes";
 
 const app = express();
 
@@ -107,6 +109,8 @@ app.get("/ready", async (_req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/onboarding", onboardingRoutes);
+app.use("/api/profile", profileRoutes);
 
 app.use(notFound);
 
