@@ -8,24 +8,20 @@ import { updateProfilePreferencesSchema, updateProfileSchema } from "./profile.v
 
 const router = Router();
 
-router.get(
-    "/",
-    authMiddleware,
-    profileController.getProfile.bind(profileController)
+router.get("/", authMiddleware, profileController.getProfile.bind(profileController));
+
+router.patch(
+  "/update",
+  authMiddleware,
+  validate(updateProfileSchema),
+  profileController.updateProfile.bind(profileController),
 );
 
 router.patch(
-    "/update",
-    authMiddleware,
-    validate(updateProfileSchema),
-    profileController.updateProfile.bind(profileController)
-);
-
-router.patch(
-    "/update/preferences",
-    authMiddleware,
-    validate(updateProfilePreferencesSchema),
-    profileController.updateProfilePreferences.bind(profileController)
+  "/update/preferences",
+  authMiddleware,
+  validate(updateProfilePreferencesSchema),
+  profileController.updateProfilePreferences.bind(profileController),
 );
 
 export default router;

@@ -9,10 +9,10 @@ import { completeOnBoardingSchema } from "./onboarding.validation";
 const router = Router();
 
 router.post(
-    "/",
-    authMiddleware,
-    validate(completeOnBoardingSchema),
-    onboardingController.completeOnboarding.bind(onboardingController)
+  "/",
+  authMiddleware,
+  validate(completeOnBoardingSchema),
+  onboardingController.completeOnboarding.bind(onboardingController),
 );
 
 export default router;

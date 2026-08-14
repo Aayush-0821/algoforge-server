@@ -48,12 +48,12 @@ export class ProfileRepository {
       },
     });
 
-    if(!user){
-        return null;
+    if (!user) {
+      return null;
     }
 
-    if(!user.profile || !user.preferences){
-        return null;
+    if (!user.profile || !user.preferences) {
+      return null;
     }
 
     return user;
@@ -84,11 +84,11 @@ export class ProfileRepository {
     });
   }
 
-  async findProgrammingLanguage(languageId: string){
+  async findProgrammingLanguage(languageId: string) {
     return this.prisma.programmingLanguage.findUnique({
-        where:{
-            id: languageId
-        }
+      where: {
+        id: languageId,
+      },
     });
   }
 }
