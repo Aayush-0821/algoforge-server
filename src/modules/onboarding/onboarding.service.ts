@@ -6,6 +6,10 @@ import { CompleteOnBoardingInput } from "./onboarding.types";
 export class OnboardingService {
   constructor(private readonly onboardingReposity: OnboardingRepository) {}
 
+  async getProgrammingLanguages() {
+    return this.onboardingReposity.getProgrammingLanguages();
+  }
+
   async completeOnboarding(userId: string, input: CompleteOnBoardingInput) {
     const exisitingUsername = await this.onboardingReposity.findUsername(input.username);
 

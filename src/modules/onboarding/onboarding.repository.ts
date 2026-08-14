@@ -6,6 +6,18 @@ import { CompleteOnBoardingInput } from "./onboarding.types";
 export class OnboardingRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
+  async getProgrammingLanguages() {
+    return this.prisma.programmingLanguage.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+      orderBy: {
+        name: "asc",
+      },
+    });
+  }
+
   async findUsername(username: string) {
     return this.prisma.userProfile.findUnique({
       where: { username },

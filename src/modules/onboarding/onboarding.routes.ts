@@ -8,6 +8,8 @@ import { completeOnBoardingSchema } from "./onboarding.validation";
 
 const router = Router();
 
+router.get("/languages", onboardingController.getProgrammingLanguages.bind(onboardingController));
+
 router.post(
   "/",
   authMiddleware,

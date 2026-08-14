@@ -45,6 +45,7 @@ export class OAuthService {
     if (!data.emailVerified) {
       throw new AppError("OAuth email is not verified.", 401);
     }
+
     const oauthAccount = await authRepository.findOAuthAccount(
       data.provider,
       data.providerAccountId,
@@ -111,6 +112,7 @@ export class OAuthService {
         id: user.id,
         email: user.email,
         isEmailVerified: user.isEmailVerified,
+        onboardingCompleted: user.onboardingCompleted,
       },
       tokens: {
         accessToken,

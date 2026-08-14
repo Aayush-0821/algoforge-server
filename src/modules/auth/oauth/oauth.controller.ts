@@ -7,6 +7,8 @@ import { getGoogleAuthUrl, exchangeGoogleCode } from "./google.oauth";
 import { oauthService } from "./oauth.service";
 import { createOAuthState, validateOAuthState } from "./oauth.state";
 
+const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
+
 export class OAuthController {
   async googleRedirect(_req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
@@ -38,12 +40,13 @@ export class OAuthController {
 
       const result = await oauthService.loginWithGoogle(profile);
 
-      res.status(200).json({
-        success: true,
-        message: "Google Login Successful.",
-        user: result.user,
-        tokens: result.tokens,
+      const params = new URLSearchParams({
+        accessToken: result.tokens.accessToken,
+        refreshToken: result.tokens.refreshToken,
+        onboardingCompleted: String(result.user.onboardingCompleted),
       });
+
+      res.redirect(`${CLIENT_URL}/auth/callback?${params.toString()}`);
     } catch (error) {
       next(error);
     }
@@ -79,12 +82,13 @@ export class OAuthController {
 
       const result = await oauthService.loginWithGitHub(profile);
 
-      res.status(200).json({
-        success: true,
-        message: "GitHub Login Successful.",
-        user: result.user,
-        tokens: result.tokens,
+      const params = new URLSearchParams({
+        accessToken: result.tokens.accessToken,
+        refreshToken: result.tokens.refreshToken,
+        onboardingCompleted: String(result.user.onboardingCompleted),
       });
+
+      res.redirect(`${CLIENT_URL}/auth/callback?${params.toString()}`);
     } catch (error) {
       next(error);
     }

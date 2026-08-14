@@ -6,6 +6,19 @@ import { completeOnBoardingSchema } from "./onboarding.validation";
 export class OnboardingController {
   constructor(private readonly onboardingService: OnboardingService) {}
 
+  async getProgrammingLanguages(_req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const languages = await this.onboardingService.getProgrammingLanguages();
+
+      res.status(200).json({
+        success: true,
+        data: languages,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async completeOnboarding(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user.id;
