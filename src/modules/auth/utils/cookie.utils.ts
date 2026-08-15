@@ -1,6 +1,6 @@
-import { env } from "../../../config/env";
 import type { Response } from "express";
 
+import { env } from "../../../config/env";
 import { COOKIE_MAX_AGE, COOKIE_NAMES } from "../auth.constants";
 
 export function setAuthCookies(res: Response, accessToken: string, refreshToken: string): void {

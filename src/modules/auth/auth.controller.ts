@@ -1,10 +1,11 @@
 import type { Request, Response, NextFunction } from "express";
 
+import { logger } from "../../config/logger";
+import { AppError } from "../../errors/app.errors";
+
+import { COOKIE_NAMES } from "./auth.constants";
 import { authService } from "./auth.service";
 import { clearAuthCookies, setAuthCookies } from "./utils/cookie.utils";
-import { COOKIE_NAMES } from "./auth.constants";
-import { AppError } from "../../errors/app.errors";
-import { logger } from "../../config/logger";
 
 export class AuthController {
   async register(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -22,11 +23,7 @@ export class AuthController {
     try {
       const result = await authService.login(req.body);
 
-      setAuthCookies(
-        res,
-        result.tokens.accessToken,
-        result.tokens.refreshToken
-      );
+      setAuthCookies(res, result.tokens.accessToken, result.tokens.refreshToken);
 
       res.status(200).json({
         message: "LoggedIn SuccessFully.",
@@ -40,17 +37,13 @@ export class AuthController {
     try {
       const refreshToken = req.cookies[COOKIE_NAMES.REFRESH_TOKEN];
 
-      if(!refreshToken){
-        throw new AppError("Refresh Token is Missing.",401);
+      if (!refreshToken) {
+        throw new AppError("Refresh Token is Missing.", 401);
       }
 
       const result = await authService.refresh(refreshToken);
 
-      setAuthCookies(
-        res,
-        result.accessToken,
-        result.refreshToken
-      );
+      setAuthCookies(res, result.accessToken, result.refreshToken);
 
       res.status(200).json({
         message: "Tokens Refreshed SuccessFully.",
@@ -63,11 +56,11 @@ export class AuthController {
     try {
       const refreshToken = req.cookies[COOKIE_NAMES.REFRESH_TOKEN];
 
-      if(refreshToken){
+      if (refreshToken) {
         try {
           await authService.logout(refreshToken);
         } catch (error) {
-          logger.warn({error},"Failed to revoke Refresh Token during logout.");
+          logger.warn({ error }, "Failed to revoke Refresh Token during logout.");
         }
       }
 
