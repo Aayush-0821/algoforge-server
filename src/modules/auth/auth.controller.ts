@@ -1,6 +1,10 @@
 import type { Request, Response, NextFunction } from "express";
 
 import { authService } from "./auth.service";
+import { clearAuthCookies, setAuthCookies } from "./utils/cookie.utils";
+import { COOKIE_NAMES } from "./auth.constants";
+import { AppError } from "../../errors/app.errors";
+import { logger } from "../../config/logger";
 
 export class AuthController {
   async register(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -18,10 +22,15 @@ export class AuthController {
     try {
       const result = await authService.login(req.body);
 
+      setAuthCookies(
+        res,
+        result.tokens.accessToken,
+        result.tokens.refreshToken
+      );
+
       res.status(200).json({
         message: "LoggedIn SuccessFully.",
         user: result.user,
-        tokens: result.tokens,
       });
     } catch (error) {
       next(error);
@@ -29,11 +38,22 @@ export class AuthController {
   }
   async refresh(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const result = await authService.refresh(req.body);
+      const refreshToken = req.cookies[COOKIE_NAMES.REFRESH_TOKEN];
+
+      if(!refreshToken){
+        throw new AppError("Refresh Token is Missing.",401);
+      }
+
+      const result = await authService.refresh(refreshToken);
+
+      setAuthCookies(
+        res,
+        result.accessToken,
+        result.refreshToken
+      );
 
       res.status(200).json({
-        message: "Tokens Refreshed!",
-        tokens: result,
+        message: "Tokens Refreshed SuccessFully.",
       });
     } catch (error) {
       next(error);
@@ -41,7 +61,17 @@ export class AuthController {
   }
   async logout(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      await authService.logout(req.body);
+      const refreshToken = req.cookies[COOKIE_NAMES.REFRESH_TOKEN];
+
+      if(refreshToken){
+        try {
+          await authService.logout(refreshToken);
+        } catch (error) {
+          logger.warn({error},"Failed to revoke Refresh Token during logout.");
+        }
+      }
+
+      clearAuthCookies(res);
 
       res.status(200).json({
         message: "Logged Out SuccessFully!",

@@ -10,7 +10,6 @@ import type {
   AuthTokens,
   ForgotPasswordDTO,
   LoginUserDTO,
-  RefreshTokenDTO,
   RegisterUserDTO,
   ResetPasswordDTO,
   VerifyEmailDTO,
@@ -111,9 +110,7 @@ export class AuthService {
     };
   }
 
-  async refresh(data: RefreshTokenDTO): Promise<AuthTokens> {
-    const refreshToken = data.refreshToken;
-
+  async refresh(refreshToken: string): Promise<AuthTokens> {
     if (!refreshToken) {
       throw new AppError("Refresh Token Missing.", 400);
     }
@@ -173,9 +170,7 @@ export class AuthService {
     return { accessToken: newAccessToken, refreshToken: newRefreshToken };
   }
 
-  async logout(data: RefreshTokenDTO): Promise<void> {
-    const refreshToken = data.refreshToken;
-
+  async logout(refreshToken: string): Promise<void> {
     if (!refreshToken) {
       throw new AppError("Refresh Token is Missing.", 400);
     }

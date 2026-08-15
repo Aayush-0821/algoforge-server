@@ -7,7 +7,6 @@ import {
   registerSchema,
   loginSchema,
   verifyEmailSchema,
-  refreshTokenSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
 } from "./auth.validation";
@@ -19,9 +18,9 @@ router.post("/register", validate(registerSchema), authController.register.bind(
 
 router.post("/login", validate(loginSchema), authController.login.bind(authController));
 
-router.post("/refresh", validate(refreshTokenSchema), authController.refresh.bind(authController));
+router.post("/refresh", authController.refresh.bind(authController));
 
-router.post("/logout", validate(refreshTokenSchema), authController.logout.bind(authController));
+router.post("/logout", authController.logout.bind(authController));
 
 router.post(
   "/verify-email",
