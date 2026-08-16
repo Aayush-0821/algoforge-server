@@ -155,16 +155,16 @@ export class DashboardRepository {
 
   async getAcceptedSubmissionDates(userId: string) {
     return this.prisma.submission.findMany({
-        where:{
-            userId,
-            status:"ACCEPTED"
-        },
-        select:{
-            submittedAt: true,
-        },
-        orderBy:{
-            submittedAt: "asc"
-        }
+      where: {
+        userId,
+        status: "ACCEPTED",
+      },
+      select: {
+        submittedAt: true,
+      },
+      orderBy: {
+        submittedAt: "asc",
+      },
     });
   }
 }

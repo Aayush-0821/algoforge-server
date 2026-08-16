@@ -8,10 +8,11 @@ import { dashboardQuerySchema } from "./dashboard.validation";
 
 const router = Router();
 
-router.get("/",
-    authMiddleware,
-    validate(dashboardQuerySchema),
-    dashboardController.getDashboard.bind(dashboardController)
+router.get(
+  "/",
+  authMiddleware,
+  validate(dashboardQuerySchema),
+  dashboardController.getDashboard.bind(dashboardController),
 );
 
 export default router;
