@@ -226,6 +226,14 @@ enum LogLevel {
   FATAL
 }
 
+enum UserActivityType {
+  PROBLEM_SOLVED
+  ROADMAP_STARTED
+  ROADMAP_COMPLETED
+  TOPIC_STARTED
+  TOPIC_COMPLETED
+}
+
 model User {
   id                      String                    @id @default(uuid())
   email                   String                    @unique
@@ -242,6 +250,7 @@ model User {
   roadmaps                Roadmap[]
   recommendations         Recommendation[]
   revisionTasks           RevisionTask[]
+  activities              UserActivity[]
   weaknessAnalyses        WeaknessAnalysis[]
   readinessScores         ReadinessScore[]
   topicProgress           UserTopicProgress[]
@@ -325,6 +334,26 @@ model UserPreference {
   updatedAt           DateTime             @updatedAt
 }
 
+model UserActivity {
+  id         String           @id @default(uuid())
+  userId     String
+  type       UserActivityType
+  problemId  String?
+  roadmapId  String?
+  topicId    String?
+  metadata   Json?
+  occurredAt DateTime         @default(now())
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem    Problem?         @relation(fields: [problemId], references: [id], onDelete: SetNull)
+  roadmap    Roadmap?         @relation(fields: [roadmapId], references: [id], onDelete: SetNull)
+  topic      Topic?           @relation(fields: [topicId], references: [id], onDelete: SetNull)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  @@index([userId, occurredAt])
+  @@index([userId, type, occurredAt])
+}
+
 model PasswordResetToken {
   id        String    @id @default(uuid())
   userId    String
@@ -395,6 +424,7 @@ model Problem {
   roadmapItems         RoadmapItemProblem[]
   recommendations      Recommendation[]
   concepts             ProblemConcept[]
+  activities           UserActivity[]
   createdAt            DateTime             @default(now())
   updatedAt            DateTime             @updatedAt
 
@@ -414,6 +444,7 @@ model Topic {
   revisionTasks    RevisionTask[]
   recommendations  Recommendation[]
   roadmapItems     RoadmapItem[]
+  activities       UserActivity[]
   createdAt        DateTime            @default(now())
   updatedAt        DateTime            @updatedAt
 }
@@ -513,6 +544,8 @@ model Submission {
   @@index([userId])
   @@index([problemId])
   @@index([submittedAt])
+  @@index([userId, submittedAt])
+  @@index([userId, status, submittedAt])
 }
 
 model StudySession {
@@ -541,6 +574,8 @@ model UserTopicProgress {
   masteryScore      Float?
   lastSolvedAt      DateTime?
   revisionDueAt     DateTime?
+  startedAt         DateTime?
+  completedAt       DateTime?
   user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   topic             Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
   createdAt         DateTime  @default(now())
@@ -587,18 +622,21 @@ model LearningEvent {
 }
 
 model Roadmap {
-  id                     String        @id @default(uuid())
+  id                     String         @id @default(uuid())
   userId                 String
   title                  String
   description            String?
   targetCompany          String?
   targetRole             String?
   estimatedDurationWeeks Int?
-  status                 RoadmapStatus @default(ACTIVE)
-  user                   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status                 RoadmapStatus  @default(ACTIVE)
+  startedAt              DateTime?
+  completedAt            DateTime?
+  user                   User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   items                  RoadmapItem[]
-  createdAt              DateTime      @default(now())
-  updatedAt              DateTime      @updatedAt
+  activities             UserActivity[]
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
 
   @@index([userId])
 }
@@ -614,9 +652,11 @@ model RoadmapItem {
   displayOrder   Int
   estimatedHours Int?
   status         RoadmapItemsStatus   @default(NOT_STARTED)
+  startedAt      DateTime?
+  completedAt    DateTime?
   roadmap        Roadmap              @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
-  topic          Topic?               @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  concept        Concept?             @relation(fields: [conceptId], references: [id], onDelete: Cascade)
+  topic          Topic?               @relation(fields: [topicId], references: [id], onDelete: SetNull)
+  concept        Concept?             @relation(fields: [conceptId], references: [id], onDelete: SetNull)
   problems       RoadmapItemProblem[]
   createdAt      DateTime             @default(now())
   updatedAt      DateTime             @updatedAt
