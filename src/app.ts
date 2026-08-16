@@ -14,8 +14,10 @@ import { notFound } from "./middleware/notFound.middleware";
 import { apiLimiter } from "./middleware/rateLimiter.middleware";
 import { requestLogger } from "./middleware/requestLogger.middleware";
 import authRoutes from "./modules/auth/auth.routes";
+import dashboardRoute from "./modules/dashboard/dashboard.routes";
 import onboardingRoutes from "./modules/onboarding/onboarding.routes";
 import profileRoutes from "./modules/profile/profile.routes";
+import settingsRoute from "./modules/settings/settings.routes";
 
 const app = express();
 
@@ -111,6 +113,8 @@ app.get("/ready", async (_req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/onboarding", onboardingRoutes);
 app.use("/api/profile", profileRoutes);
+app.use("/api/dashboard", dashboardRoute);
+app.use("/api/settings", settingsRoute);
 
 app.use(notFound);
 
