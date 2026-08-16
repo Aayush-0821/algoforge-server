@@ -8,24 +8,20 @@ import { deleteAccountSchema, updateNotificationPreferencesSchema } from "./sett
 
 const router = Router();
 
-router.get(
-    "/",
-    authMiddleware,
-    settingsController.getSettings.bind(settingsController)
-);
+router.get("/", authMiddleware, settingsController.getSettings.bind(settingsController));
 
 router.patch(
-    "/notifications",
-    authMiddleware,
-    validate(updateNotificationPreferencesSchema),
-    settingsController.updateNotificationPreferences.bind(settingsController)
+  "/notifications",
+  authMiddleware,
+  validate(updateNotificationPreferencesSchema),
+  settingsController.updateNotificationPreferences.bind(settingsController),
 );
 
 router.delete(
-    "/account",
-    authMiddleware,
-    validate(deleteAccountSchema),
-    settingsController.deleteAccount.bind(settingsController)
+  "/account",
+  authMiddleware,
+  validate(deleteAccountSchema),
+  settingsController.deleteAccount.bind(settingsController),
 );
 
 export default router;
