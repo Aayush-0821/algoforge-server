@@ -12,19 +12,12 @@ function getStateKey(provider: OAuthProvider, state: string): string {
   return `oauth:state:${provider}:${state}`;
 }
 
-export async function createOAuthState(
-  provider: OAuthProvider,
-  mode: OAuthMode,
-): Promise<string> {
+export async function createOAuthState(provider: OAuthProvider, mode: OAuthMode): Promise<string> {
   const state = randomBytes(32).toString("hex");
 
   const key = getStateKey(provider, state);
 
-  await redisClient.setEx(
-    key,
-    OAUTH_STATE_TTL,
-    JSON.stringify({ mode }),
-  );
+  await redisClient.setEx(key, OAUTH_STATE_TTL, JSON.stringify({ mode }));
 
   return state;
 }

@@ -6,9 +6,8 @@ import { setAuthCookies } from "../utils/cookie.utils";
 import { getGitHubAuthUrl, exchangeGitHubCode } from "./github.oauth";
 import { getGoogleAuthUrl, exchangeGoogleCode } from "./google.oauth";
 import { oauthService } from "./oauth.service";
-import { createOAuthState, validateOAuthState } from "./oauth.state";
-
 import type { OAuthMode } from "./oauth.service";
+import { createOAuthState, validateOAuthState } from "./oauth.state";
 
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
 
