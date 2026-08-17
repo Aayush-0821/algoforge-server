@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 
 import { AppError } from "../../../errors/app.errors";
+import { setAuthCookies } from "../utils/cookie.utils";
 
 import { getGitHubAuthUrl, exchangeGitHubCode } from "./github.oauth";
 import { getGoogleAuthUrl, exchangeGoogleCode } from "./google.oauth";
@@ -40,13 +41,11 @@ export class OAuthController {
 
       const result = await oauthService.loginWithGoogle(profile);
 
-      const params = new URLSearchParams({
-        accessToken: result.tokens.accessToken,
-        refreshToken: result.tokens.refreshToken,
-        onboardingCompleted: String(result.user.onboardingCompleted),
-      });
+      setAuthCookies(res, result.tokens.accessToken, result.tokens.refreshToken);
 
-      res.redirect(`${CLIENT_URL}/auth/callback?${params.toString()}`);
+      res.redirect(
+        `${CLIENT_URL}/auth/callback?onboardingCompleted=${result.user.onboardingCompleted}`,
+      );
     } catch (error) {
       next(error);
     }
@@ -82,13 +81,11 @@ export class OAuthController {
 
       const result = await oauthService.loginWithGitHub(profile);
 
-      const params = new URLSearchParams({
-        accessToken: result.tokens.accessToken,
-        refreshToken: result.tokens.refreshToken,
-        onboardingCompleted: String(result.user.onboardingCompleted),
-      });
+      setAuthCookies(res, result.tokens.accessToken, result.tokens.refreshToken);
 
-      res.redirect(`${CLIENT_URL}/auth/callback?${params.toString()}`);
+      res.redirect(
+        `${CLIENT_URL}/auth/callback?onboardingCompleted=${result.user.onboardingCompleted}`,
+      );
     } catch (error) {
       next(error);
     }
