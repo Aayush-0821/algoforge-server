@@ -62,24 +62,21 @@ export class OAuthService {
     );
 
     if (mode === "login") {
-  if (oauthAccount) {
-    return this.issueTokens(oauthAccount.user);
-  }
+      if (oauthAccount) {
+        return this.issueTokens(oauthAccount.user);
+      }
 
-  const existingUser = await authRepository.findUserByEmail(data.email);
+      const existingUser = await authRepository.findUserByEmail(data.email);
 
-  if (existingUser) {
-    throw new AppError(
-      "Account exists. Please login using your email/password or connect this provider from settings.",
-      409,
-    );
-  }
+      if (existingUser) {
+        throw new AppError(
+          "Account exists. Please login using your email/password or connect this provider from settings.",
+          409,
+        );
+      }
 
-  throw new AppError(
-    "No account found. Please sign up first.",
-    404,
-  );
-}
+      throw new AppError("No account found. Please sign up first.", 404);
+    }
 
     if (oauthAccount) {
       throw new AppError("An account already exists. Please log in instead.", 409);

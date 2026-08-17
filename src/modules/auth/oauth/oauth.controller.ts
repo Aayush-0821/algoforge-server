@@ -50,20 +50,12 @@ export class OAuthController {
         `${CLIENT_URL}/auth/callback?onboardingCompleted=${result.user.onboardingCompleted}`,
       );
     } catch (error) {
-  const message =
-    error instanceof Error
-      ? error.message
-      : "Google authentication failed.";
+      const message = error instanceof Error ? error.message : "Google authentication failed.";
 
-  const mode =
-    req.query.mode === "signup"
-      ? "signup"
-      : "login";
+      const mode = req.query.mode === "signup" ? "signup" : "login";
 
-  res.redirect(
-    `${CLIENT_URL}/${mode}?error=${encodeURIComponent(message)}`,
-  );
-}
+      res.redirect(`${CLIENT_URL}/${mode}?error=${encodeURIComponent(message)}`);
+    }
   }
 
   async githubRedirect(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -104,20 +96,12 @@ export class OAuthController {
         `${CLIENT_URL}/auth/callback?onboardingCompleted=${result.user.onboardingCompleted}`,
       );
     } catch (error) {
-  const message =
-    error instanceof Error
-      ? error.message
-      : "GitHub authentication failed.";
+      const message = error instanceof Error ? error.message : "GitHub authentication failed.";
 
-  const mode =
-    req.query.mode === "signup"
-      ? "signup"
-      : "login";
+      const mode = req.query.mode === "signup" ? "signup" : "login";
 
-  res.redirect(
-    `${CLIENT_URL}/${mode}?error=${encodeURIComponent(message)}`,
-  );
-}
+      res.redirect(`${CLIENT_URL}/${mode}?error=${encodeURIComponent(message)}`);
+    }
   }
 
   private getOAuthMode(req: Request): OAuthMode {
