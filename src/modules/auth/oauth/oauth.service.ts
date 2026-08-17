@@ -10,38 +10,48 @@ import type { GitHubProfile } from "./github.oauth";
 import type { GoogleProfile } from "./google.oauth";
 
 export type OAuthProvider = "GOOGLE" | "GITHUB";
+export type OAuthMode = "login" | "signup";
 
 export class OAuthService {
-  async loginWithGoogle(profile: GoogleProfile) {
-    return this.loginWithProvider({
-      provider: "GOOGLE",
-      providerAccountId: profile.id,
-      email: profile.email,
-      name: profile.name,
-      avatarUrl: profile.picture,
-      emailVerified: profile.email_verified,
-    });
+  async loginWithGoogle(profile: GoogleProfile, mode: OAuthMode) {
+    return this.loginWithProvider(
+      {
+        provider: "GOOGLE",
+        providerAccountId: profile.id,
+        email: profile.email,
+        name: profile.name,
+        avatarUrl: profile.picture,
+        emailVerified: profile.email_verified,
+      },
+      mode,
+    );
   }
 
-  async loginWithGitHub(profile: GitHubProfile) {
-    return this.loginWithProvider({
-      provider: "GITHUB",
-      providerAccountId: profile.id,
-      email: profile.email,
-      name: profile.name,
-      avatarUrl: profile.avatarUrl,
-      emailVerified: profile.emailVerified,
-    });
+  async loginWithGitHub(profile: GitHubProfile, mode: OAuthMode) {
+    return this.loginWithProvider(
+      {
+        provider: "GITHUB",
+        providerAccountId: profile.id,
+        email: profile.email,
+        name: profile.name,
+        avatarUrl: profile.avatarUrl,
+        emailVerified: profile.emailVerified,
+      },
+      mode,
+    );
   }
 
-  private async loginWithProvider(data: {
-    provider: OAuthProvider;
-    providerAccountId: string;
-    email: string;
-    name?: string;
-    avatarUrl?: string;
-    emailVerified: boolean;
-  }) {
+  private async loginWithProvider(
+    data: {
+      provider: OAuthProvider;
+      providerAccountId: string;
+      email: string;
+      name?: string;
+      avatarUrl?: string;
+      emailVerified: boolean;
+    },
+    mode: OAuthMode,
+  ) {
     if (!data.emailVerified) {
       throw new AppError("OAuth email is not verified.", 401);
     }
@@ -51,36 +61,49 @@ export class OAuthService {
       data.providerAccountId,
     );
 
-    let user;
-
-    if (oauthAccount) {
-      user = oauthAccount.user;
-    } else {
-      user = await authRepository.findUserByEmail(data.email);
-
-      if (!user) {
-        user = await authRepository.createUser({
-          email: data.email,
-          password: null,
-          isEmailVerified: true,
-        });
-      } else if (!user.isEmailVerified) {
-        user = await authRepository.updateUser(user.id, {
-          isEmailVerified: true,
-        });
+    if (mode === "login") {
+      if (!oauthAccount) {
+        throw new AppError("No account found. Please sign up first.", 404);
       }
 
-      await authRepository.createOAuthAccount({
-        provider: data.provider,
-        providerAccountId: data.providerAccountId,
-        user: {
-          connect: {
-            id: user.id,
-          },
-        },
-      });
+      return this.issueTokens(oauthAccount.user);
     }
 
+    if (oauthAccount) {
+      throw new AppError("An account already exists. Please log in instead.", 409);
+    }
+
+    const existingUser = await authRepository.findUserByEmail(data.email);
+
+    if (existingUser) {
+      throw new AppError("An account with this email already exists. Please log in instead.", 409);
+    }
+
+    const user = await authRepository.createUser({
+      email: data.email,
+      password: null,
+      isEmailVerified: true,
+    });
+
+    await authRepository.createOAuthAccount({
+      provider: data.provider,
+      providerAccountId: data.providerAccountId,
+      user: {
+        connect: {
+          id: user.id,
+        },
+      },
+    });
+
+    return this.issueTokens(user);
+  }
+
+  private async issueTokens(user: {
+    id: string;
+    email: string;
+    isEmailVerified: boolean;
+    onboardingCompleted: boolean;
+  }) {
     const tokenId = nanoid();
 
     const accessToken = await generateAccessToken({
