@@ -26,7 +26,7 @@ export class OAuthController {
     }
   }
 
-  async googleCallback(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async googleCallback(req: Request, res: Response, _next: NextFunction): Promise<void> {
     try {
       const { code, state } = req.query;
 
@@ -50,7 +50,11 @@ export class OAuthController {
         `${CLIENT_URL}/auth/callback?onboardingCompleted=${result.user.onboardingCompleted}`,
       );
     } catch (error) {
-      next(error);
+      const message = error instanceof Error ? error.message : "Google authentication failed.";
+
+      const mode = req.query.mode === "signup" ? "signup" : "login";
+
+      res.redirect(`${CLIENT_URL}/${mode}?error=${encodeURIComponent(message)}`);
     }
   }
 
@@ -68,7 +72,7 @@ export class OAuthController {
     }
   }
 
-  async githubCallback(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async githubCallback(req: Request, res: Response, _next: NextFunction): Promise<void> {
     try {
       const { code, state } = req.query;
 
@@ -92,7 +96,11 @@ export class OAuthController {
         `${CLIENT_URL}/auth/callback?onboardingCompleted=${result.user.onboardingCompleted}`,
       );
     } catch (error) {
-      next(error);
+      const message = error instanceof Error ? error.message : "GitHub authentication failed.";
+
+      const mode = req.query.mode === "signup" ? "signup" : "login";
+
+      res.redirect(`${CLIENT_URL}/${mode}?error=${encodeURIComponent(message)}`);
     }
   }
 
