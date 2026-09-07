@@ -52,10 +52,6 @@ export class ProfileRepository {
       return null;
     }
 
-    if (!user.profile || !user.preferences) {
-      return null;
-    }
-
     return user;
   }
 
