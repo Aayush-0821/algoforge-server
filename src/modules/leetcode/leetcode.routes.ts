@@ -3,20 +3,14 @@ import { leetcodeController } from "./leetcode.controller";
 
 const router = Router();
 
-router.get(
-  "/profile/:username",
-  leetcodeController.getProfile.bind(leetcodeController),
-);
+router.get("/profile/:username", leetcodeController.getProfile.bind(leetcodeController));
 
 router.get(
   "/submissions/:username",
   leetcodeController.getRecentSubmissions.bind(leetcodeController),
 );
 
-router.get(
-  "/problem/:titleSlug",
-  leetcodeController.getProblem.bind(leetcodeController),
-);
+router.get("/problem/:titleSlug", leetcodeController.getProblem.bind(leetcodeController));
 
 router.get(
   "/submissions/:username/:titleSlug",

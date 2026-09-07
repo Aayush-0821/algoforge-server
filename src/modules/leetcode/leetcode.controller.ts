@@ -36,9 +36,7 @@ export class LeetCodeController {
 
   async getProblem(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { titleSlug } = userProblemParamSchema
-        .pick({ titleSlug: true })
-        .parse(req.params);
+      const { titleSlug } = userProblemParamSchema.pick({ titleSlug: true }).parse(req.params);
 
       res.status(200).json({
         success: true,
@@ -49,33 +47,21 @@ export class LeetCodeController {
     }
   }
 
-  async getUserProblemSubmissions(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
+  async getUserProblemSubmissions(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { username, titleSlug } = userProblemParamSchema.parse(req.params);
       const { limit } = recentSubmissionsQuerySchema.parse(req.query);
 
       res.status(200).json({
         success: true,
-        data: await leetcodeService.getPublicUserProblemSubmissions(
-          username,
-          titleSlug,
-          limit,
-        ),
+        data: await leetcodeService.getPublicUserProblemSubmissions(username, titleSlug, limit),
       });
     } catch (error) {
       next(error);
     }
   }
 
-  async getSubmissionDetails(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
+  async getSubmissionDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { submissionId } = submissionIdParamSchema.parse(req.params);
 

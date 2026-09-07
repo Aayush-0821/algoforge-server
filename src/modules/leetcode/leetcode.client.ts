@@ -88,10 +88,7 @@ class LeetCodeClient {
     }
 
     if (body.errors?.length) {
-      throw new AppError(
-        body.errors[0]?.message || "LeetCode GraphQL request failed.",
-        502,
-      );
+      throw new AppError(body.errors[0]?.message || "LeetCode GraphQL request failed.", 502);
     }
 
     if (!body.data) {
@@ -128,9 +125,7 @@ class LeetCodeClient {
     });
   }
 
-  async getSubmissionDetails(
-    submissionId: number,
-  ): Promise<LeetCodeSubmissionDetailsQueryData> {
+  async getSubmissionDetails(submissionId: number): Promise<LeetCodeSubmissionDetailsQueryData> {
     return this.request({
       query: SUBMISSION_DETAILS_QUERY,
       variables: { submissionId },

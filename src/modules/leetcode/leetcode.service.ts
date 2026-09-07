@@ -33,7 +33,7 @@ class LeetCodeService {
 
     const stats = user.submitStatsGlobal?.acSubmissionNum ?? [];
     const count = (difficulty: string) =>
-      stats.find(x => x.difficulty.toLowerCase() === difficulty.toLowerCase())?.count ?? 0;
+      stats.find((x) => x.difficulty.toLowerCase() === difficulty.toLowerCase())?.count ?? 0;
 
     const profile: LeetCodeProfile = {
       username: user.username,
@@ -52,17 +52,13 @@ class LeetCodeService {
     return profile;
   }
 
-  async getRecentSubmissions(
-    username: string,
-    limit: number,
-  ): Promise<LeetCodeRecentSubmission[]> {
+  async getRecentSubmissions(username: string, limit: number): Promise<LeetCodeRecentSubmission[]> {
     const key = cacheKey.recent(username, limit);
     const cached = await redisService.get(key);
     if (cached) return JSON.parse(cached) as LeetCodeRecentSubmission[];
 
     const submissions =
-      (await leetcodeClient.getRecentSubmissions(username, limit))
-        .recentAcSubmissionList ?? [];
+      (await leetcodeClient.getRecentSubmissions(username, limit)).recentAcSubmissionList ?? [];
 
     await redisService.set(key, JSON.stringify(submissions), TTL.recent);
     return submissions;
@@ -93,35 +89,26 @@ class LeetCodeService {
     const recent = await this.getRecentSubmissions(username, limit);
 
     const submissions = recent.filter(
-      submission =>
-        submission.titleSlug.toLowerCase() === titleSlug.toLowerCase(),
+      (submission) => submission.titleSlug.toLowerCase() === titleSlug.toLowerCase(),
     );
 
     return {
       username,
       titleSlug,
       submissions,
-      note:
-        "This uses LeetCode's public recentAcSubmissionList. It returns recent accepted submissions only (public, max 20), not the user's complete attempt history.",
+      note: "This uses LeetCode's public recentAcSubmissionList. It returns recent accepted submissions only (public, max 20), not the user's complete attempt history.",
     };
   }
 
-  async getSubmissionDetails(
-    submissionId: number,
-  ): Promise<LeetCodeSubmissionDetail> {
+  async getSubmissionDetails(submissionId: number): Promise<LeetCodeSubmissionDetail> {
     const key = cacheKey.detail(submissionId);
     const cached = await redisService.get(key);
     if (cached) return JSON.parse(cached) as LeetCodeSubmissionDetail;
 
-    const details =
-      (await leetcodeClient.getSubmissionDetails(submissionId))
-        .submissionDetails;
+    const details = (await leetcodeClient.getSubmissionDetails(submissionId)).submissionDetails;
 
     if (!details) {
-      throw new AppError(
-        "Submission details are not publicly available for this submission.",
-        403,
-      );
+      throw new AppError("Submission details are not publicly available for this submission.", 403);
     }
 
     await redisService.set(key, JSON.stringify(details), TTL.detail);
