@@ -230,23 +230,20 @@ export class SubscriptionRepository {
     });
   }
 
-  async incrementFeatureUsage(
-    userId: string,
-    featureKey: string,
-  ){
+  async incrementFeatureUsage(userId: string, featureKey: string) {
     return this.prisma.featureUsage.update({
-      where:{
-        userId_featureKey:{
+      where: {
+        userId_featureKey: {
           userId,
           featureKey,
-        }
-      },
-      data:{
-        usageCount:{
-          increment: 1
         },
-        lastUsedAt: new Date()
-      }
+      },
+      data: {
+        usageCount: {
+          increment: 1,
+        },
+        lastUsedAt: new Date(),
+      },
     });
   }
 }

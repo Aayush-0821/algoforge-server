@@ -6,19 +6,19 @@ export const createSubscriptionSchema = z.object({
 });
 
 export const applyPromoCodeSchema = z.object({
-    code: z.string().trim().min(1).max(50),
-    planId: z.string().uuid()
+  code: z.string().trim().min(1).max(50),
+  planId: z.string().uuid(),
 });
 
 export const verifyPaymentSchema = z.object({
-    razorpayOrderId: z.string().trim().min(1),
-    razorpayPaymentId: z.string().trim().min(1),
-    razorpaySignature: z.string().trim().min(1)
+  razorpayOrderId: z.string().trim().min(1),
+  razorpayPaymentId: z.string().trim().min(1),
+  razorpaySignature: z.string().trim().min(1),
 });
 
 export const razorpayWebhookSchema = z.object({
-    event: z.string().trim().min(1),
-    payload: z.record(z.string(), z.unknown())
+  event: z.string().trim().min(1),
+  payload: z.record(z.string(), z.unknown()),
 });
 
 export type CreateSubscriptionInput = z.infer<typeof createSubscriptionSchema>;
