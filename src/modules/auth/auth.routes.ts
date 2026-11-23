@@ -2,6 +2,8 @@ import { Router } from "express";
 
 import { validate } from "../../middleware/validate.middleware";
 
+import { authMiddleware } from "../../middleware/auth.middleware";
+
 import { authController } from "./auth.controller";
 import {
   registerSchema,
@@ -45,6 +47,12 @@ router.get("/google", oauthController.googleRedirect.bind(oauthController));
 router.get("/google/callback", oauthController.googleCallback.bind(oauthController));
 
 router.get("/github", oauthController.githubRedirect.bind(oauthController));
+
+router.get(
+  "/github/connect",
+  authMiddleware,
+  oauthController.githubConnectRedirect.bind(oauthController),
+);
 
 router.get("/github/callback", oauthController.githubCallback.bind(oauthController));
 

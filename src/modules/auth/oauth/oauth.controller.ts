@@ -3,22 +3,54 @@ import type { Request, Response, NextFunction } from "express";
 import { AppError } from "../../../errors/app.errors";
 import { setAuthCookies } from "../utils/cookie.utils";
 
-import { getGitHubAuthUrl, exchangeGitHubCode } from "./github.oauth";
-import { getGoogleAuthUrl, exchangeGoogleCode } from "./google.oauth";
-import { oauthService } from "./oauth.service";
-import type { OAuthMode } from "./oauth.service";
-import { createOAuthState, validateOAuthState } from "./oauth.state";
+import { env } from "../../../config/env";
 
-const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
+import {
+  getGitHubAuthUrl,
+  exchangeGitHubCode,
+} from "./github.oauth";
+
+import {
+  getGoogleAuthUrl,
+  exchangeGoogleCode,
+} from "./google.oauth";
+
+import {
+  oauthService,
+} from "./oauth.service";
+
+import type {
+  OAuthMode as ServiceOAuthMode,
+} from "./oauth.service";
+
+import {
+  createOAuthState,
+  validateOAuthState,
+} from "./oauth.state";
+
+import {
+  saveGitHubConnection,
+} from "../../github/github.service";
+
+// Use the same frontend URL your application already uses.
+const CLIENT_URL = env.FRONTEND_URL;
 
 export class OAuthController {
-  async googleRedirect(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async googleRedirect(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
       const mode = this.getOAuthMode(req);
 
-      const state = await createOAuthState("GOOGLE", mode);
+      const state = await createOAuthState(
+        "GOOGLE",
+        mode,
+      );
 
-      const authUrl = getGoogleAuthUrl(state);
+      const authUrl =
+        getGoogleAuthUrl(state);
 
       res.redirect(authUrl);
     } catch (error) {
@@ -26,45 +58,94 @@ export class OAuthController {
     }
   }
 
-  async googleCallback(req: Request, res: Response, _next: NextFunction): Promise<void> {
+  async googleCallback(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
     try {
       const { code, state } = req.query;
 
       if (typeof code !== "string") {
-        throw new AppError("Google authorization code is missing.", 400);
+        throw new AppError(
+          "Google authorization code is missing.",
+          400,
+        );
       }
 
       if (typeof state !== "string") {
-        throw new AppError("Google OAuth state is missing.", 400);
+        throw new AppError(
+          "Google OAuth state is missing.",
+          400,
+        );
       }
 
-      const { mode } = await validateOAuthState("GOOGLE", state);
+      const { mode } =
+        await validateOAuthState(
+          "GOOGLE",
+          state,
+        );
 
-      const profile = await exchangeGoogleCode(code);
+      // Google only supports the existing
+      // login/signup OAuth flow.
+      if (
+        mode !== "login" &&
+        mode !== "signup"
+      ) {
+        throw new AppError(
+          "Invalid Google OAuth mode.",
+          400,
+        );
+      }
 
-      const result = await oauthService.loginWithGoogle(profile, mode);
+      const profile =
+        await exchangeGoogleCode(code);
 
-      setAuthCookies(res, result.tokens.accessToken, result.tokens.refreshToken);
+      const result =
+        await oauthService.loginWithGoogle(
+          profile,
+          mode as ServiceOAuthMode,
+        );
+
+      setAuthCookies(
+        res,
+        result.tokens.accessToken,
+        result.tokens.refreshToken,
+      );
 
       res.redirect(
         `${CLIENT_URL}/auth/callback?onboardingCompleted=${result.user.onboardingCompleted}`,
       );
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Google authentication failed.";
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Google authentication failed.";
 
-      const mode = req.query.mode === "signup" ? "signup" : "login";
-
-      res.redirect(`${CLIENT_URL}/${mode}?error=${encodeURIComponent(message)}`);
+      res.redirect(
+        `${CLIENT_URL}/login?error=${encodeURIComponent(
+          message,
+        )}`,
+      );
     }
   }
 
-  async githubRedirect(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async githubRedirect(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
-      const mode = this.getOAuthMode(req);
+      const mode =
+        this.getOAuthMode(req);
 
-      const state = await createOAuthState("GITHUB", mode);
+      const state =
+        await createOAuthState(
+          "GITHUB",
+          mode,
+        );
 
-      const authUrl = getGitHubAuthUrl(state);
+      const authUrl =
+        getGitHubAuthUrl(state);
 
       res.redirect(authUrl);
     } catch (error) {
@@ -72,47 +153,146 @@ export class OAuthController {
     }
   }
 
-  async githubCallback(req: Request, res: Response, _next: NextFunction): Promise<void> {
+  async githubConnectRedirect(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const userId = req.user?.id;
+
+      if (!userId) {
+        throw new AppError(
+          "You must be logged in to connect GitHub.",
+          401,
+        );
+      }
+
+      const state =
+        await createOAuthState(
+          "GITHUB",
+          "connect",
+          userId,
+        );
+
+      const authUrl =
+        getGitHubAuthUrl(state);
+
+      res.redirect(authUrl);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async githubCallback(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
     try {
       const { code, state } = req.query;
 
       if (typeof code !== "string") {
-        throw new AppError("GitHub authorization code is missing.", 400);
+        throw new AppError(
+          "GitHub authorization code is missing.",
+          400,
+        );
       }
 
       if (typeof state !== "string") {
-        throw new AppError("GitHub OAuth state is missing.", 400);
+        throw new AppError(
+          "GitHub OAuth state is missing.",
+          400,
+        );
       }
 
-      const { mode } = await validateOAuthState("GITHUB", state);
+      const {
+        mode,
+        userId,
+      } = await validateOAuthState(
+        "GITHUB",
+        state,
+      );
 
-      const profile = await exchangeGitHubCode(code);
+      const {
+        profile,
+        token,
+      } = await exchangeGitHubCode(code);
 
-      const result = await oauthService.loginWithGitHub(profile, mode);
+      // -----------------------------------------
+      // CONNECT GITHUB TO EXISTING ALGOFORGE USER
+      // -----------------------------------------
+      if (mode === "connect") {
+        if (!userId) {
+          throw new AppError(
+            "Invalid GitHub connection state.",
+            400,
+          );
+        }
 
-      setAuthCookies(res, result.tokens.accessToken, result.tokens.refreshToken);
+        await saveGitHubConnection(
+          userId,
+          profile,
+          token,
+        );
+
+        res.redirect(
+          `${CLIENT_URL}/github/connected`,
+        );
+
+        return;
+      }
+
+      // -----------------------------------------
+      // EXISTING LOGIN / SIGNUP FLOW
+      // -----------------------------------------
+
+      const result =
+        await oauthService.loginWithGitHub(
+          profile,
+          mode,
+        );
+
+      setAuthCookies(
+        res,
+        result.tokens.accessToken,
+        result.tokens.refreshToken,
+      );
 
       res.redirect(
         `${CLIENT_URL}/auth/callback?onboardingCompleted=${result.user.onboardingCompleted}`,
       );
     } catch (error) {
-      const message = error instanceof Error ? error.message : "GitHub authentication failed.";
+      const message =
+        error instanceof Error
+          ? error.message
+          : "GitHub authentication failed.";
 
-      const mode = req.query.mode === "signup" ? "signup" : "login";
-
-      res.redirect(`${CLIENT_URL}/${mode}?error=${encodeURIComponent(message)}`);
+      res.redirect(
+        `${CLIENT_URL}/login?error=${encodeURIComponent(
+          message,
+        )}`,
+      );
     }
   }
 
-  private getOAuthMode(req: Request): OAuthMode {
+  private getOAuthMode(
+    req: Request,
+  ): ServiceOAuthMode {
     const { mode } = req.query;
 
-    if (mode !== "login" && mode !== "signup") {
-      throw new AppError("Invalid OAuth mode.", 400);
+    if (
+      mode !== "login" &&
+      mode !== "signup"
+    ) {
+      throw new AppError(
+        "Invalid OAuth mode.",
+        400,
+      );
     }
 
     return mode;
   }
 }
 
-export const oauthController = new OAuthController();
+export const oauthController =
+  new OAuthController();
