@@ -65,6 +65,39 @@ export class OnboardingRepository {
           preferredLanguageId: input.preferredLanguageId,
         },
       });
+      await tx.notificationPreference.upsert({
+        where: {
+          userId,
+        },
+
+        create: {
+          userId,
+
+          emailEnabled: true,
+
+          inAppEnabled: true,
+
+          revisionNotification: true,
+
+          roadmapNotification: true,
+
+          dailyGoalNotification: true,
+
+          weeklyReportNotification: true,
+
+          recommendationNotification: true,
+
+          paymentNotification: true,
+
+          marketingNotification: false,
+
+          quietHoursStart: null,
+
+          quietHoursEnd: null,
+        },
+
+        update: {},
+      });
 
       const user = await tx.user.update({
         where: {

@@ -6,14 +6,17 @@ import { setAuthCookies } from "../utils/cookie.utils";
 import { getGitHubAuthUrl, exchangeGitHubCode } from "./github.oauth";
 import { getGoogleAuthUrl, exchangeGoogleCode } from "./google.oauth";
 import { oauthService } from "./oauth.service";
+import type { OAuthMode } from "./oauth.service";
 import { createOAuthState, validateOAuthState } from "./oauth.state";
 
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
 
 export class OAuthController {
-  async googleRedirect(_req: Request, res: Response, next: NextFunction): Promise<void> {
+  async googleRedirect(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const state = await createOAuthState("GOOGLE");
+      const mode = this.getOAuthMode(req);
+
+      const state = await createOAuthState("GOOGLE", mode);
 
       const authUrl = getGoogleAuthUrl(state);
 
@@ -23,7 +26,7 @@ export class OAuthController {
     }
   }
 
-  async googleCallback(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async googleCallback(req: Request, res: Response, _next: NextFunction): Promise<void> {
     try {
       const { code, state } = req.query;
 
@@ -35,11 +38,11 @@ export class OAuthController {
         throw new AppError("Google OAuth state is missing.", 400);
       }
 
-      await validateOAuthState("GOOGLE", state);
+      const { mode } = await validateOAuthState("GOOGLE", state);
 
       const profile = await exchangeGoogleCode(code);
 
-      const result = await oauthService.loginWithGoogle(profile);
+      const result = await oauthService.loginWithGoogle(profile, mode);
 
       setAuthCookies(res, result.tokens.accessToken, result.tokens.refreshToken);
 
@@ -47,13 +50,19 @@ export class OAuthController {
         `${CLIENT_URL}/auth/callback?onboardingCompleted=${result.user.onboardingCompleted}`,
       );
     } catch (error) {
-      next(error);
+      const message = error instanceof Error ? error.message : "Google authentication failed.";
+
+      const mode = req.query.mode === "signup" ? "signup" : "login";
+
+      res.redirect(`${CLIENT_URL}/${mode}?error=${encodeURIComponent(message)}`);
     }
   }
 
-  async githubRedirect(_req: Request, res: Response, next: NextFunction): Promise<void> {
+  async githubRedirect(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const state = await createOAuthState("GITHUB");
+      const mode = this.getOAuthMode(req);
+
+      const state = await createOAuthState("GITHUB", mode);
 
       const authUrl = getGitHubAuthUrl(state);
 
@@ -63,7 +72,7 @@ export class OAuthController {
     }
   }
 
-  async githubCallback(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async githubCallback(req: Request, res: Response, _next: NextFunction): Promise<void> {
     try {
       const { code, state } = req.query;
 
@@ -75,11 +84,11 @@ export class OAuthController {
         throw new AppError("GitHub OAuth state is missing.", 400);
       }
 
-      await validateOAuthState("GITHUB", state);
+      const { mode } = await validateOAuthState("GITHUB", state);
 
       const profile = await exchangeGitHubCode(code);
 
-      const result = await oauthService.loginWithGitHub(profile);
+      const result = await oauthService.loginWithGitHub(profile, mode);
 
       setAuthCookies(res, result.tokens.accessToken, result.tokens.refreshToken);
 
@@ -87,8 +96,22 @@ export class OAuthController {
         `${CLIENT_URL}/auth/callback?onboardingCompleted=${result.user.onboardingCompleted}`,
       );
     } catch (error) {
-      next(error);
+      const message = error instanceof Error ? error.message : "GitHub authentication failed.";
+
+      const mode = req.query.mode === "signup" ? "signup" : "login";
+
+      res.redirect(`${CLIENT_URL}/${mode}?error=${encodeURIComponent(message)}`);
     }
+  }
+
+  private getOAuthMode(req: Request): OAuthMode {
+    const { mode } = req.query;
+
+    if (mode !== "login" && mode !== "signup") {
+      throw new AppError("Invalid OAuth mode.", 400);
+    }
+
+    return mode;
   }
 }
 

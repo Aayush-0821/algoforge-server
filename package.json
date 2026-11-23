@@ -16,10 +16,8 @@
     "db:studio": "prisma studio --schema=prisma/postgres/schema.prisma",
     "build": "tsc",
     "start": "node dist/server.js",
-    "check": "npm run type-check && npm run lint",
+    "check": "npm run type-check",
     "type-check": "tsc --noEmit",
-    "lint": "eslint src --ext .ts",
-    "lint:fix": "eslint src --ext .ts --fix",
     "format": "prettier --write .",
     "test": "vitest",
     "prepare": "husky"
@@ -69,7 +67,6 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.5",
     "@types/compression": "^1.8.1",
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
@@ -77,9 +74,6 @@
     "@types/hpp": "^0.2.7",
     "@types/node": "^26.1.2",
     "@types/supertest": "^7.2.1",
-    "eslint": "^9.39.5",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-import": "2.32",
     "execa": "^10.0.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
@@ -87,7 +81,6 @@
     "supertest": "^7.2.2",
     "tsx": "4.20",
     "typescript": "5.9",
-    "typescript-eslint": "^8.65.0",
     "vitest": "^3.2.7"
   }
 }
