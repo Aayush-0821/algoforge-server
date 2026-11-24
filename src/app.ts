@@ -18,8 +18,8 @@ import dashboardRoute from "./modules/dashboard/dashboard.routes";
 import onboardingRoutes from "./modules/onboarding/onboarding.routes";
 import profileRoutes from "./modules/profile/profile.routes";
 import settingsRoute from "./modules/settings/settings.routes";
-import subscriptionRoute from "./modules/subscriptions/subscriptions.routes";
-import leetcodeRoute from "./modules/leetcode/leetcode.routes";
+import githubRoutes from "./modules/github/github.routes.js";
+import analyticsRoutes from "./modules/analytics/analytics.routes.js";
 
 const app = express();
 
@@ -117,8 +117,13 @@ app.use("/api/onboarding", onboardingRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/dashboard", dashboardRoute);
 app.use("/api/settings", settingsRoute);
-app.use("/api/subscription", subscriptionRoute);
-app.use("/api/leetcode", leetcodeRoute);
+
+app.use(
+  "/api/github",
+  githubRoutes,
+);
+
+app.use("/api/analytics",analyticsRoutes);
 
 app.use(notFound);
 

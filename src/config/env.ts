@@ -42,11 +42,20 @@ const envSchema = z.object({
 
   GOOGLE_CALLBACK_URL: z.string(),
 
+  GITHUB_TOKEN_ENCRYPTION_KEY: z.string().min(32),
+
   GITHUB_CLIENT_ID: z.string(),
 
   GITHUB_CLIENT_SECRET: z.string(),
 
   GITHUB_CALLBACK_URL: z.string(),
+
+  LLM_API_KEY: z.string(),
+  LLM_MODEL: z.string().default("gpt-4o-mini"),
+  LLM_BASE_URL: z
+    .string()
+    .url()
+    .default("https://api.openai.com/v1"),
 });
 
 export const env = envSchema.parse(process.env);

@@ -49,6 +49,7 @@ export interface AuthResponse {
     id: string;
     email: string;
     isEmailVerified: boolean;
+    onboardingCompleted: boolean;
   };
   tokens: AuthTokens;
 }
