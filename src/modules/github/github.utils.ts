@@ -7,16 +7,10 @@ export function slugify(value: string): string {
     .slice(0, 100);
 }
 
-export function createRevisionFilePath(
-  problemNumber: string,
-  problemTitle: string,
-): string {
+export function createRevisionFilePath(problemNumber: string, problemTitle: string): string {
   return `problems/${slugify(problemNumber)}-${slugify(problemTitle)}.md`;
 }
 
-export function createCommitMessage(
-  problemNumber: string,
-  problemTitle: string,
-): string {
+export function createCommitMessage(problemNumber: string, problemTitle: string): string {
   return `docs: add revision for ${problemNumber}. ${problemTitle}`;
 }

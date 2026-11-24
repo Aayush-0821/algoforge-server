@@ -1,9 +1,7 @@
 import { env } from "../../config/env.js";
 import { AppError } from "../../errors/app.errors.js";
 
-import type {
-  StructuredRevision,
-} from "./github.types.js";
+import type { StructuredRevision } from "./github.types.js";
 
 export interface RevisionGenerationInput {
   problemNumber: string;
@@ -58,9 +56,7 @@ function extractJson(text: string): string {
     return trimmed;
   }
 
-  const fencedMatch = trimmed.match(
-    /```(?:json)?\s*([\s\S]*?)\s*```/i,
-  );
+  const fencedMatch = trimmed.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
 
   if (fencedMatch?.[1]) {
     return fencedMatch[1].trim();
@@ -73,89 +69,49 @@ function extractJson(text: string): string {
     return trimmed.slice(start, end + 1);
   }
 
-  throw new AppError(
-    "LLM returned an invalid revision response.",
-    502,
-  );
+  throw new AppError("LLM returned an invalid revision response.", 502);
 }
 
-function validateRevision(
-  value: unknown,
-): StructuredRevision {
-  if (
-    typeof value !== "object" ||
-    value === null
-  ) {
-    throw new AppError(
-      "LLM returned an invalid revision object.",
-      502,
-    );
+function validateRevision(value: unknown): StructuredRevision {
+  if (typeof value !== "object" || value === null) {
+    throw new AppError("LLM returned an invalid revision object.", 502);
   }
 
-  const revision =
-    value as Record<string, unknown>;
+  const revision = value as Record<string, unknown>;
 
   if (
     typeof revision.approach !== "string" ||
     typeof revision.keyIdea !== "string" ||
     typeof revision.whatToRemember !== "string"
   ) {
-    throw new AppError(
-      "LLM revision is missing required fields.",
-      502,
-    );
+    throw new AppError("LLM revision is missing required fields.", 502);
   }
 
-  const complexity =
-    revision.complexity as
-      | Record<string, unknown>
-      | undefined;
+  const complexity = revision.complexity as Record<string, unknown> | undefined;
 
-  if (
-    !complexity ||
-    typeof complexity.time !== "string" ||
-    typeof complexity.space !== "string"
-  ) {
-    throw new AppError(
-      "LLM revision has invalid complexity data.",
-      502,
-    );
+  if (!complexity || typeof complexity.time !== "string" || typeof complexity.space !== "string") {
+    throw new AppError("LLM revision has invalid complexity data.", 502);
   }
 
   if (
     !Array.isArray(revision.algorithm) ||
-    !revision.algorithm.every(
-      (item) => typeof item === "string",
-    )
+    !revision.algorithm.every((item) => typeof item === "string")
   ) {
-    throw new AppError(
-      "LLM revision has an invalid algorithm.",
-      502,
-    );
+    throw new AppError("LLM revision has an invalid algorithm.", 502);
   }
 
   if (
     !Array.isArray(revision.commonMistakes) ||
-    !revision.commonMistakes.every(
-      (item) => typeof item === "string",
-    )
+    !revision.commonMistakes.every((item) => typeof item === "string")
   ) {
-    throw new AppError(
-      "LLM revision has invalid common mistakes.",
-      502,
-    );
+    throw new AppError("LLM revision has invalid common mistakes.", 502);
   }
 
   if (
     !Array.isArray(revision.interviewNotes) ||
-    !revision.interviewNotes.every(
-      (item) => typeof item === "string",
-    )
+    !revision.interviewNotes.every((item) => typeof item === "string")
   ) {
-    throw new AppError(
-      "LLM revision has invalid interview notes.",
-      502,
-    );
+    throw new AppError("LLM revision has invalid interview notes.", 502);
   }
 
   return {
@@ -166,12 +122,9 @@ function validateRevision(
       time: complexity.time,
       space: complexity.space,
     },
-    commonMistakes:
-      revision.commonMistakes,
-    interviewNotes:
-      revision.interviewNotes,
-    whatToRemember:
-      revision.whatToRemember,
+    commonMistakes: revision.commonMistakes,
+    interviewNotes: revision.interviewNotes,
+    whatToRemember: revision.whatToRemember,
   };
 }
 
@@ -200,57 +153,49 @@ Submitted Solution:
 ${input.code}
 `;
 
-  const response = await fetch(
-    `${env.LLM_BASE_URL}/chat/completions`,
-    {
-      method: "POST",
+  const response = await fetch(`${env.LLM_BASE_URL}/chat/completions`, {
+    method: "POST",
 
-      headers: {
-        Authorization:
-          `Bearer ${env.LLM_API_KEY}`,
+    headers: {
+      Authorization: `Bearer ${env.LLM_API_KEY}`,
 
-        "Content-Type":
-          "application/json",
-      },
-
-      body: JSON.stringify({
-        model: env.LLM_MODEL,
-
-        temperature: 0.2,
-
-        messages: [
-          {
-            role: "system",
-            content: SYSTEM_PROMPT,
-          },
-          {
-            role: "user",
-            content: userPrompt,
-          },
-        ],
-
-        response_format: {
-          type: "json_object",
-        },
-      }),
+      "Content-Type": "application/json",
     },
-  );
+
+    body: JSON.stringify({
+      model: env.LLM_MODEL,
+
+      temperature: 0.2,
+
+      messages: [
+        {
+          role: "system",
+          content: SYSTEM_PROMPT,
+        },
+        {
+          role: "user",
+          content: userPrompt,
+        },
+      ],
+
+      response_format: {
+        type: "json_object",
+      },
+    }),
+  });
 
   if (!response.ok) {
-    let message =
-      `LLM request failed (${response.status}).`;
+    let message = `LLM request failed (${response.status}).`;
 
     try {
-      const body =
-        (await response.json()) as {
-          error?: {
-            message?: string;
-          };
+      const body = (await response.json()) as {
+        error?: {
+          message?: string;
         };
+      };
 
       if (body.error?.message) {
-        message =
-          `LLM request failed: ${body.error.message}`;
+        message = `LLM request failed: ${body.error.message}`;
       }
     } catch {
       // Keep generic message.
@@ -259,36 +204,26 @@ ${input.code}
     throw new AppError(message, 502);
   }
 
-  const body =
-    (await response.json()) as {
-      choices?: Array<{
-        message?: {
-          content?: string;
-        };
-      }>;
-    };
+  const body = (await response.json()) as {
+    choices?: Array<{
+      message?: {
+        content?: string;
+      };
+    }>;
+  };
 
-  const content =
-    body.choices?.[0]?.message?.content;
+  const content = body.choices?.[0]?.message?.content;
 
   if (!content) {
-    throw new AppError(
-      "LLM returned an empty revision.",
-      502,
-    );
+    throw new AppError("LLM returned an empty revision.", 502);
   }
 
   let parsed: unknown;
 
   try {
-    parsed = JSON.parse(
-      extractJson(content),
-    );
+    parsed = JSON.parse(extractJson(content));
   } catch {
-    throw new AppError(
-      "LLM returned malformed revision JSON.",
-      502,
-    );
+    throw new AppError("LLM returned malformed revision JSON.", 502);
   }
 
   return validateRevision(parsed);

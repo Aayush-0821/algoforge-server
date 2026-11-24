@@ -118,12 +118,9 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/dashboard", dashboardRoute);
 app.use("/api/settings", settingsRoute);
 
-app.use(
-  "/api/github",
-  githubRoutes,
-);
+app.use("/api/github", githubRoutes);
 
-app.use("/api/analytics",analyticsRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
 app.use(notFound);
 

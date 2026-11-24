@@ -1,25 +1,15 @@
 import { postgres } from "../../database/postgres/postgres.js";
 import type { Prisma } from "../../../generated/postgres/index.js";
 
-import type {
-  GitHubProfile,
-  GitHubTokenResponse,
-} from "../auth/oauth/github.oauth.js";
+import type { GitHubProfile, GitHubTokenResponse } from "../auth/oauth/github.oauth.js";
 
-import {
-  encryptGitHubToken,
-} from "./github.crypto.js";
+import { encryptGitHubToken } from "./github.crypto.js";
 
 import { AppError } from "../../errors/app.errors.js";
 
-import {
-  decryptGitHubToken,
-} from "./github.crypto.js";
+import { decryptGitHubToken } from "./github.crypto.js";
 
-import {
-  AIJobStatus,
-  AIJobType,
-} from "../../../generated/postgres/index.js";
+import { AIJobStatus, AIJobType } from "../../../generated/postgres/index.js";
 
 import { mongo } from "../../database/mongo/mongodb.js";
 
@@ -28,22 +18,13 @@ export async function saveGitHubConnection(
   profile: GitHubProfile,
   token: GitHubTokenResponse,
 ) {
-  const accessTokenExpiresAt =
-    token.expires_in
-      ? new Date(
-          Date.now() +
-            token.expires_in * 1000,
-        )
-      : null;
+  const accessTokenExpiresAt = token.expires_in
+    ? new Date(Date.now() + token.expires_in * 1000)
+    : null;
 
-  const refreshTokenExpiresAt =
-    token.refresh_token_expires_in
-      ? new Date(
-          Date.now() +
-            token.refresh_token_expires_in *
-              1000,
-        )
-      : null;
+  const refreshTokenExpiresAt = token.refresh_token_expires_in
+    ? new Date(Date.now() + token.refresh_token_expires_in * 1000)
+    : null;
 
   return postgres.gitHubConnection.upsert({
     where: {
@@ -58,17 +39,9 @@ export async function saveGitHubConnection(
       githubEmail: profile.email,
       avatarUrl: profile.avatarUrl ?? null,
 
-      accessTokenEncrypted:
-        encryptGitHubToken(
-          token.access_token,
-        ),
+      accessTokenEncrypted: encryptGitHubToken(token.access_token),
 
-      refreshTokenEncrypted:
-        token.refresh_token
-          ? encryptGitHubToken(
-              token.refresh_token,
-            )
-          : null,
+      refreshTokenEncrypted: token.refresh_token ? encryptGitHubToken(token.refresh_token) : null,
 
       accessTokenExpiresAt,
       refreshTokenExpiresAt,
@@ -82,17 +55,9 @@ export async function saveGitHubConnection(
       githubEmail: profile.email,
       avatarUrl: profile.avatarUrl ?? null,
 
-      accessTokenEncrypted:
-        encryptGitHubToken(
-          token.access_token,
-        ),
+      accessTokenEncrypted: encryptGitHubToken(token.access_token),
 
-      refreshTokenEncrypted:
-        token.refresh_token
-          ? encryptGitHubToken(
-              token.refresh_token,
-            )
-          : null,
+      refreshTokenEncrypted: token.refresh_token ? encryptGitHubToken(token.refresh_token) : null,
 
       accessTokenExpiresAt,
       refreshTokenExpiresAt,
@@ -102,50 +67,30 @@ export async function saveGitHubConnection(
   });
 }
 
-export async function getGitHubConnection(
-  userId: string,
-) {
-  const connection =
-    await postgres.gitHubConnection.findUnique({
-      where: {
-        userId,
-      },
-    });
+export async function getGitHubConnection(userId: string) {
+  const connection = await postgres.gitHubConnection.findUnique({
+    where: {
+      userId,
+    },
+  });
 
   if (!connection) {
-    throw new AppError(
-      "GitHub is not connected to your AlgoForge account.",
-      400,
-    );
+    throw new AppError("GitHub is not connected to your AlgoForge account.", 400);
   }
 
   return connection;
 }
 
-export async function getGitHubAccessToken(
-  userId: string,
-): Promise<string> {
-  const connection =
-    await getGitHubConnection(userId);
+export async function getGitHubAccessToken(userId: string): Promise<string> {
+  const connection = await getGitHubConnection(userId);
 
-  if (
-    connection.accessTokenExpiresAt &&
-    connection.accessTokenExpiresAt <= new Date()
-  ) {
-    throw new AppError(
-      "Your GitHub connection has expired. Please reconnect GitHub.",
-      401,
-    );
+  if (connection.accessTokenExpiresAt && connection.accessTokenExpiresAt <= new Date()) {
+    throw new AppError("Your GitHub connection has expired. Please reconnect GitHub.", 401);
   }
 
-  return decryptGitHubToken(
-    connection.accessTokenEncrypted,
-  );
+  return decryptGitHubToken(connection.accessTokenEncrypted);
 }
-export async function createGithubSummaryJob(
-  userId: string,
-  metadata: Prisma.InputJsonValue,
-) {
+export async function createGithubSummaryJob(userId: string, metadata: Prisma.InputJsonValue) {
   return postgres.aIJob.create({
     data: {
       userId,
@@ -156,9 +101,7 @@ export async function createGithubSummaryJob(
   });
 }
 
-export async function markGithubSummaryJobProcessing(
-  jobId: string,
-) {
+export async function markGithubSummaryJobProcessing(jobId: string) {
   return postgres.aIJob.update({
     where: {
       id: jobId,
@@ -171,9 +114,7 @@ export async function markGithubSummaryJobProcessing(
   });
 }
 
-export async function markGithubSummaryJobCompleted(
-  jobId: string,
-) {
+export async function markGithubSummaryJobCompleted(jobId: string) {
   return postgres.aIJob.update({
     where: {
       id: jobId,
@@ -186,10 +127,7 @@ export async function markGithubSummaryJobCompleted(
   });
 }
 
-export async function markGithubSummaryJobFailed(
-  jobId: string,
-  errorMessage: string,
-) {
+export async function markGithubSummaryJobFailed(jobId: string, errorMessage: string) {
   return postgres.aIJob.update({
     where: {
       id: jobId,
@@ -221,29 +159,21 @@ export async function saveGithubSummary(
       userId,
       date: new Date(),
 
-      summaryMarkdown:
-        data.summaryMarkdown,
+      summaryMarkdown: data.summaryMarkdown,
 
-      repositoryName:
-        data.repositoryName,
+      repositoryName: data.repositoryName,
 
-      commitMessage:
-        data.commitMessage,
+      commitMessage: data.commitMessage,
 
-      commitHash:
-        data.commitHash,
+      commitHash: data.commitHash,
 
-      branch:
-        data.branch,
+      branch: data.branch,
 
-      filesChanged:
-        data.filesChanged,
+      filesChanged: data.filesChanged,
 
-      generatedBy:
-        data.generatedBy,
+      generatedBy: data.generatedBy,
 
-      modelVersion:
-        data.modelVersion,
+      modelVersion: data.modelVersion,
     },
   });
 }

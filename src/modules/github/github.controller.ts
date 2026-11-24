@@ -10,19 +10,13 @@ import {
 } from "./github.service.js";
 import { revisionVaultSchema } from "./github.validation.js";
 import { ensureRevisionVaultRepository } from "./github.repository.js";
-import {
-  createRevisionFilePath,
-  createCommitMessage,
-} from "./github.utils.js";
+import { createRevisionFilePath, createCommitMessage } from "./github.utils.js";
 import { createOrUpdateRepositoryFile } from "./github.client.js";
 import { generateRevision } from "./github.llm.js";
 import { renderRevisionMarkdown } from "./github.markdown.js";
 import { mongo } from "../../database/mongo/mongodb";
 
-export async function getGitHubStatus(
-  req: Request,
-  res: Response,
-): Promise<void> {
+export async function getGitHubStatus(req: Request, res: Response): Promise<void> {
   const userId = req.user?.id;
 
   if (!userId) {
@@ -42,10 +36,7 @@ export async function getGitHubStatus(
   });
 }
 
-export async function createRevisionVault(
-  req: Request,
-  res: Response,
-): Promise<void> {
+export async function createRevisionVault(req: Request, res: Response): Promise<void> {
   const userId = req.user?.id;
 
   if (!userId) {
@@ -67,10 +58,7 @@ export async function createRevisionVault(
   try {
     await markGithubSummaryJobProcessing(job.id);
 
-    const repository = await ensureRevisionVaultRepository(
-      accessToken,
-      connection.githubUsername,
-    );
+    const repository = await ensureRevisionVaultRepository(accessToken, connection.githubUsername);
 
     const revision = await generateRevision({
       problemNumber: input.problemNumber,
@@ -83,15 +71,9 @@ export async function createRevisionVault(
 
     const markdown = renderRevisionMarkdown(input, revision);
 
-    const filePath = createRevisionFilePath(
-      input.problemNumber,
-      input.problemTitle,
-    );
+    const filePath = createRevisionFilePath(input.problemNumber, input.problemTitle);
 
-    const commitMessage = createCommitMessage(
-      input.problemNumber,
-      input.problemTitle,
-    );
+    const commitMessage = createCommitMessage(input.problemNumber, input.problemTitle);
 
     const fileResult = await createOrUpdateRepositoryFile(
       accessToken,
@@ -132,8 +114,7 @@ export async function createRevisionVault(
       },
     });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Failed to create revision.";
+    const errorMessage = error instanceof Error ? error.message : "Failed to create revision.";
 
     await markGithubSummaryJobFailed(job.id, errorMessage);
 
