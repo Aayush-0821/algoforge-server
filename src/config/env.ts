@@ -54,7 +54,7 @@ const envSchema = z.object({
   LLM_MODEL: z.string().default("gpt-4o-mini"),
   LLM_BASE_URL: z.string().url().default("https://api.openai.com/v1"),
   AI_SERVICE_URL: z.string().url().default("http://localhost:5001"),
-  AI_SERVICE_TIMEOUT_MS: z.coerce.number().default(3000)
+  AI_SERVICE_TIMEOUT_MS: z.coerce.number().default(3000),
 });
 
 export const env = envSchema.parse(process.env);
