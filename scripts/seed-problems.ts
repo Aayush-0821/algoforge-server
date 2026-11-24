@@ -34,9 +34,7 @@ const DIFF_MAP: Record<string, DifficultyLevel> = {
 function loadProblems(): RawProblem[] {
   const raw = readFileSync(RAW_PATH, "utf-8");
   const parsed = JSON.parse(raw);
-  const arr = Array.isArray(parsed)
-    ? parsed
-    : Object.values(parsed).find((v) => Array.isArray(v));
+  const arr = Array.isArray(parsed) ? parsed : Object.values(parsed).find((v) => Array.isArray(v));
   if (!Array.isArray(arr)) throw new Error("Raw dataset is not a list");
   return arr as RawProblem[];
 }
