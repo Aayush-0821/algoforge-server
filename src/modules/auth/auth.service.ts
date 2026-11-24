@@ -102,7 +102,7 @@ export class AuthService {
         id: user.id,
         email: user.email,
         isEmailVerified: user.isEmailVerified,
-        onboardingCompleted : user.onboardingCompleted
+        onboardingCompleted: user.onboardingCompleted,
       },
       tokens: {
         accessToken,

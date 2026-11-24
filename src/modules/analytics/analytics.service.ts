@@ -1,7 +1,9 @@
 import { SubmissionStatus } from "../../../generated/postgres";
 import type { ExperienceLevel } from "../../../generated/postgres";
+import { logger } from "../../config/logger";
 import { AppError } from "../../errors/app.errors";
 
+import { analyticsAIClient, AnalyticsAIClient } from "./analytics.ai-client";
 import {
   CANDIDATE_POOL_SIZE,
   DIFFICULTIES_BY_ORDER,
@@ -13,8 +15,8 @@ import {
   RECOMMENDATION_LIMIT,
   RECOMMENDATION_REASON,
   RECOMMENDATION_TTL_DAYS,
+  REGENCY_DECAY,
 } from "./analytics.constants";
-import { problemRecommender, ProblemRecommender } from "./analytics.recommender";
 import { AnalyticsRepository, analyticsRepository } from "./analytics.repository";
 import type {
   HistoryEntry,
@@ -35,7 +37,7 @@ type ProblemRow = Awaited<ReturnType<AnalyticsRepository["findProblemsBySlugs"]>
 export class AnalyticsService {
   constructor(
     private readonly analyticsRepository: AnalyticsRepository,
-    private readonly recommender: ProblemRecommender,
+    private readonly aiClient: AnalyticsAIClient = analyticsAIClient,
   ) {}
 
   async recordSubmission(
@@ -50,9 +52,7 @@ export class AnalyticsService {
     // Unknown language names are stored as null rather than rejecting the submission
     let languageId: string | null = null;
     if (input.language) {
-      const language = await this.analyticsRepository.findProgrammingLanguageByName(
-        input.language,
-      );
+      const language = await this.analyticsRepository.findProgrammingLanguageByName(input.language);
       languageId = language?.id ?? null;
     }
 
@@ -72,7 +72,7 @@ export class AnalyticsService {
     try {
       recommendations = await this.generateRecommendations(userId);
     } catch (error) {
-      console.error("Failed to generate recommendations", error); // TODO: use your logger
+      logger.error({ err: error, userId }, "Failed to generate recommendations");
     }
 
     return { submission, recommendations };
@@ -91,7 +91,11 @@ export class AnalyticsService {
     return this.generateRecommendations(userId);
   }
 
-  async submitFeedback(userId: string, recommendationId: string, input: RecommendationFeedbackInput) {
+  async submitFeedback(
+    userId: string,
+    recommendationId: string,
+    input: RecommendationFeedbackInput,
+  ) {
     const updated = await this.analyticsRepository.updateRecommendationFeedback(
       userId,
       recommendationId,
@@ -116,11 +120,31 @@ export class AnalyticsService {
     const ceiling = this.difficultyCeiling(history, experienceLevel);
     const exclude = new Set<string>([...solvedSlugs, ...history.map((h) => h.slug)]);
 
-    const candidates = this.recommender.recommend(history, {
-      excludeSlugs: exclude,
-      maxDifficulty: ceiling,
-      limit: CANDIDATE_POOL_SIZE,
-    });
+    // Call the AI service. On failure, candidates stays empty and cold-start runs below.
+    let candidates: ScoredCandidate[] = [];
+    try {
+      const aiCandidates = await this.aiClient.recommend({
+        history: history.map((h) => ({ slug: h.slug, status: h.status })),
+        n: CANDIDATE_POOL_SIZE,
+        decay: REGENCY_DECAY,
+        excludeSlugs: [...exclude],
+        maxDifficulty: ceiling,
+      });
+
+      candidates = aiCandidates.map((c) => ({
+        slug: c.slug,
+        score: c.score,
+        reasonCode: c.reasonCode,
+      }));
+    } catch (err) {
+      logger.warn(
+        { err: err instanceof Error ? err.message : err, userId },
+        "AI service unavailable; falling back to cold-start",
+      );
+      // Intentionally do NOT fall back to the in-process recommender here.
+      // The server has no models/problem_model.json — that lives only in algoforge-ai.
+      // Empty candidates → empty picked → coldStart() picks popular problems from DB.
+    }
 
     let picked: NewRecommendation[] = [];
     if (candidates.length > 0) {
@@ -130,7 +154,7 @@ export class AnalyticsService {
       picked = this.rank(candidates, problems);
     }
 
-    // New user, or none of the candidates exist in the DB yet
+    // New user, AI service down, or none of the candidates exist in the DB
     if (picked.length === 0) {
       picked = await this.coldStart(exclude, ceiling);
     }
@@ -151,7 +175,10 @@ export class AnalyticsService {
 
   /** Rows are newest first; keeps the latest submission per problem. */
   private buildHistory(
-    rows: { status: SubmissionStatus; problem: { slug: string; difficulty: HistoryEntry["difficulty"] } }[],
+    rows: {
+      status: SubmissionStatus;
+      problem: { slug: string; difficulty: HistoryEntry["difficulty"] };
+    }[],
   ): HistoryEntry[] {
     const seen = new Set<string>();
     const history: HistoryEntry[] = [];
@@ -238,4 +265,4 @@ export class AnalyticsService {
   }
 }
 
-export const analyticsService = new AnalyticsService(analyticsRepository, problemRecommender);
+export const analyticsService = new AnalyticsService(analyticsRepository);

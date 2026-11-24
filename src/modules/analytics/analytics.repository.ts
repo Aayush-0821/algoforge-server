@@ -122,11 +122,7 @@ export class AnalyticsRepository {
   }
 
   /** Expires the user's current problem recommendations and stores the new set. */
-  async replaceActiveRecommendations(
-    userId: string,
-    items: NewRecommendation[],
-    expiresAt: Date,
-  ) {
+  async replaceActiveRecommendations(userId: string, items: NewRecommendation[], expiresAt: Date) {
     const now = new Date();
 
     return this.prisma.$transaction(async (tx) => {

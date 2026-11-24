@@ -23,10 +23,7 @@ export async function createOAuthState(
   userId?: string,
 ): Promise<string> {
   if (mode === "connect" && !userId) {
-    throw new AppError(
-      "Authenticated user is required to connect GitHub.",
-      401,
-    );
+    throw new AppError("Authenticated user is required to connect GitHub.", 401);
   }
 
   const state = randomBytes(32).toString("hex");
@@ -38,11 +35,7 @@ export async function createOAuthState(
 
   const key = getStateKey(provider, state);
 
-  await redisClient.setEx(
-    key,
-    OAUTH_STATE_TTL,
-    JSON.stringify(stateData),
-  );
+  await redisClient.setEx(key, OAUTH_STATE_TTL, JSON.stringify(stateData));
 
   return state;
 }
@@ -56,10 +49,7 @@ export async function validateOAuthState(
   const storedState = await redisClient.get(key);
 
   if (!storedState) {
-    throw new AppError(
-      "Invalid or Expired OAuth State.",
-      400,
-    );
+    throw new AppError("Invalid or Expired OAuth State.", 400);
   }
 
   // OAuth states are single-use.
@@ -73,21 +63,13 @@ export async function validateOAuthState(
     throw new AppError("Invalid OAuth State.", 400);
   }
 
-  if (
-    typeof parsedState !== "object" ||
-    parsedState === null ||
-    !("mode" in parsedState)
-  ) {
+  if (typeof parsedState !== "object" || parsedState === null || !("mode" in parsedState)) {
     throw new AppError("Invalid OAuth State.", 400);
   }
 
   const stateData = parsedState as OAuthStateData;
 
-  if (
-    stateData.mode !== "login" &&
-    stateData.mode !== "signup" &&
-    stateData.mode !== "connect"
-  ) {
+  if (stateData.mode !== "login" && stateData.mode !== "signup" && stateData.mode !== "connect") {
     throw new AppError("Invalid OAuth State.", 400);
   }
 

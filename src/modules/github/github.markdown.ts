@@ -1,34 +1,21 @@
-import type {
-  RevisionGenerationInput,
-} from "./github.llm.js";
+import type { RevisionGenerationInput } from "./github.llm.js";
 
-import type {
-  StructuredRevision,
-} from "./github.types.js";
+import type { StructuredRevision } from "./github.types.js";
 
 export function renderRevisionMarkdown(
   input: RevisionGenerationInput,
   revision: StructuredRevision,
 ): string {
-  const algorithm = revision.algorithm
-    .map(
-      (step, index) =>
-        `${index + 1}. ${step}`,
-    )
-    .join("\n");
+  const algorithm = revision.algorithm.map((step, index) => `${index + 1}. ${step}`).join("\n");
 
   const commonMistakes =
     revision.commonMistakes.length > 0
-      ? revision.commonMistakes
-          .map((item) => `- ${item}`)
-          .join("\n")
+      ? revision.commonMistakes.map((item) => `- ${item}`).join("\n")
       : "- None identified.";
 
   const interviewNotes =
     revision.interviewNotes.length > 0
-      ? revision.interviewNotes
-          .map((item) => `- ${item}`)
-          .join("\n")
+      ? revision.interviewNotes.map((item) => `- ${item}`).join("\n")
       : "- None.";
 
   return `# ${input.problemNumber}. ${input.problemTitle}
@@ -77,11 +64,8 @@ ${input.problemUrl}
 `;
 }
 
-function getMarkdownLanguage(
-  language: string,
-): string {
-  const normalized =
-    language.toLowerCase();
+function getMarkdownLanguage(language: string): string {
+  const normalized = language.toLowerCase();
 
   const mapping: Record<string, string> = {
     "c++": "cpp",
@@ -98,8 +82,5 @@ function getMarkdownLanguage(
     swift: "swift",
   };
 
-  return (
-    mapping[normalized] ??
-    normalized.replace(/[^a-z0-9+#-]/g, "")
-  );
+  return mapping[normalized] ?? normalized.replace(/[^a-z0-9+#-]/g, "");
 }
